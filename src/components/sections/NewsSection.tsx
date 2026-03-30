@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, User, Eye, Loader2 } from "lucide-react";
 
 interface News {
@@ -28,7 +27,7 @@ const mockNews: News[] = [
     title: 'Partido Liberal lança programa de governo para 2024-2029',
     slug: 'programa-governo-2024-2029',
     summary: 'Propostas incluem investimentos massivos em saúde, educação e infraestrutura em todas as províncias.',
-    content: '<p>O Partido Liberal apresentou hoje o seu programa de governo para o período 2024-2029, com propostas ambiciosas para transformar Angola.</p>',
+    content: '<p>O Partido Liberal apresentou hoje o seu programa de governo para o período 2024-2029.</p>',
     image: null,
     category: 'comunicado',
     featured: true,
@@ -41,8 +40,8 @@ const mockNews: News[] = [
     id: '2',
     title: 'Comício em Saurimo reúne mais de 10 mil pessoas',
     slug: 'comicio-saurimo-10-mil',
-    summary: 'Evento marcou o lançamento da campanha na província da Lunda Sul com forte presença de jovens.',
-    content: '<p>Mais de 10 mil pessoas participaram do comício do Partido Liberal em Saurimo.</p>',
+    summary: 'Evento marcou o lançamento da campanha na província da Lunda Sul.',
+    content: '<p>Mais de 10 mil pessoas participaram do comício.</p>',
     image: null,
     category: 'imprensa',
     featured: true,
@@ -55,8 +54,8 @@ const mockNews: News[] = [
     id: '3',
     title: 'Partido Liberal condena violência política',
     slug: 'condena-violencia-politica',
-    summary: 'Nota oficial repudia atos de intolerância e convoca todos os partidos ao diálogo.',
-    content: '<p>O Partido Liberal vem a público condenar veementemente todos os atos de violência política.</p>',
+    summary: 'Nota oficial repudia atos de intolerância.',
+    content: '<p>O Partido Liberal condena veementemente todos os atos de violência.</p>',
     image: null,
     category: 'nota_oficial',
     featured: true,
@@ -69,13 +68,13 @@ const mockNews: News[] = [
     id: '4',
     title: 'Candidatos do PL participam de debate televisivo',
     slug: 'debate-televisivo-candidatos',
-    summary: 'Representantes apresentaram propostas para os setores de saúde e educação.',
-    content: '<p>Os candidatos do Partido Liberal participaram de um debate televisivo.</p>',
+    summary: 'Representantes apresentaram propostas para saúde e educação.',
+    content: '<p>Os candidatos participaram de um debate televisivo.</p>',
     image: null,
     category: 'imprensa',
     featured: false,
     published: true,
-    author: 'Assessoria de Imprensa',
+    author: 'Assessoria',
     views: 1234,
     createdAt: new Date('2024-01-12').toISOString(),
   },
@@ -83,8 +82,8 @@ const mockNews: News[] = [
     id: '5',
     title: 'Encontro com jovens empreendedores em Benguela',
     slug: 'encontro-jovens-empreendedores',
-    summary: 'Evento discute políticas de apoio ao empreendedorismo juvenil na região.',
-    content: '<p>Um encontro com jovens empreendedores foi realizado em Benguela.</p>',
+    summary: 'Evento discute políticas de apoio ao empreendedorismo juvenil.',
+    content: '<p>Um encontro com jovens empreendedores foi realizado.</p>',
     image: null,
     category: 'social',
     featured: false,
@@ -97,8 +96,8 @@ const mockNews: News[] = [
     id: '6',
     title: 'Nova sede do partido inaugurada em Huambo',
     slug: 'nova-sede-huambo',
-    summary: 'Espaço moderno vai atender militantes e realizar eventos partidários.',
-    content: '<p>A nova sede do Partido Liberal em Huambo foi inaugurada.</p>',
+    summary: 'Espaço moderno vai atender militantes e eventos.',
+    content: '<p>A nova sede foi inaugurada.</p>',
     image: null,
     category: 'institucional',
     featured: false,
@@ -106,20 +105,6 @@ const mockNews: News[] = [
     author: 'Secretaria-Geral',
     views: 543,
     createdAt: new Date('2024-01-10').toISOString(),
-  },
-  {
-    id: '7',
-    title: 'Programa de saúde materno-infantil apresentado',
-    slug: 'programa-saude-materno-infantil',
-    summary: 'Proposta prevê construção de maternidades em todas as províncias.',
-    content: '<p>O programa de saúde materno-infantil foi apresentado pela equipe de saúde.</p>',
-    image: null,
-    category: 'politica',
-    featured: false,
-    published: true,
-    author: 'Redação PL',
-    views: 789,
-    createdAt: new Date('2024-01-09').toISOString(),
   },
 ];
 
@@ -134,7 +119,6 @@ const categoryLabels: Record<string, string> = {
   institucional: "Institucional",
 };
 
-// Helper function to format dates consistently (avoid hydration mismatch)
 const MONTHS_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
 function formatDate(dateStr: string) {
@@ -169,188 +153,88 @@ export function NewsSection() {
     router.push(`/noticia/${item.slug}`);
   };
 
-  // Get up to 3 featured news, or first 3 if no featured
-  const featuredNews = news.filter((n) => n.featured).slice(0, 3);
-  const displayFeatured = featuredNews.length >= 3 
-    ? featuredNews 
-    : news.slice(0, 3);
-  
-  // Regular news are the ones not in featured
-  const regularNews = news.filter((n) => !displayFeatured.find(f => f.id === n.id));
-
   return (
-    <>
-      <section id="noticias" className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="mb-12">
-            <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
-              Notícias
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              Últimas <span className="text-party-blue">Notícias</span>
-            </h2>
-          </div>
-
-          {loading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-party-blue" />
-            </div>
-          ) : (
-            <>
-              {/* Featured News - Flex Layout para evitar espaços vazios */}
-              <div className="flex flex-col lg:flex-row gap-6 mb-8">
-                {/* Main Featured News (Large) */}
-                {displayFeatured[0] && (
-                  <Card
-                    key={displayFeatured[0].id}
-                    className="lg:w-2/3 rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0"
-                    onClick={() => handleNewsClick(displayFeatured[0])}
-                  >
-                    <div className="h-64 lg:h-80 relative overflow-hidden">
-                      {displayFeatured[0].image ? (
-                        <img
-                          src={displayFeatured[0].image}
-                          alt={displayFeatured[0].title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-blue-gradient" />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
-                        {categoryLabels[displayFeatured[0].category] || displayFeatured[0].category}
-                      </span>
-                    </div>
-                    <CardContent className="p-6">
-                      <h3 className="text-2xl font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2">
-                        {displayFeatured[0].title}
-                      </h3>
-                      <p className="text-muted-foreground mb-4">
-                        {displayFeatured[0].summary}
-                      </p>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4 text-slate-500" />
-                          <span>{formatDate(displayFeatured[0].createdAt)}</span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1">
-                            <User className="w-4 h-4 text-slate-500" />
-                            <span className="text-slate-600 font-medium">{displayFeatured[0].author}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-4 h-4 text-slate-500" />
-                            <span>{displayFeatured[0].views || 0}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Secondary Featured News (Stacked) */}
-                <div className="lg:w-1/3 flex flex-col gap-6">
-                  {displayFeatured.slice(1, 3).map((item) => (
-                    <Card
-                      key={item.id}
-                      className="flex-1 rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0"
-                      onClick={() => handleNewsClick(item)}
-                    >
-                      <div className="h-40 relative overflow-hidden">
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-blue-gradient" />
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        <span className="absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium bg-white/90 text-blue-700">
-                          {categoryLabels[item.category] || item.category}
-                        </span>
-                      </div>
-                      <CardContent className="p-4">
-                        <h3 className="text-lg font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2 line-clamp-2">
-                          {item.title}
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                          {item.summary}
-                        </p>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-slate-500" />
-                            <span>{formatDate(item.createdAt)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-3 h-3 text-slate-500" />
-                            <span>{item.views || 0}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-
-              {/* Regular News - Horizontal List */}
-              {regularNews.length > 0 && (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {regularNews.slice(0, 4).map((item) => (
-                    <Card
-                      key={item.id}
-                      className="rounded-lg shadow-sm overflow-hidden group cursor-pointer hover:shadow-md transition-all duration-300 border-0"
-                      onClick={() => handleNewsClick(item)}
-                    >
-                      <div className="h-32 relative overflow-hidden">
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-blue-gradient-light" />
-                        )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs bg-white/90 text-blue-700">
-                          {categoryLabels[item.category] || item.category}
-                        </span>
-                      </div>
-                      <CardContent className="p-3">
-                        <h4 className="font-semibold text-foreground text-sm group-hover:text-party-blue transition-colors line-clamp-2 mb-2">
-                          {item.title}
-                        </h4>
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 text-slate-500" />
-                            <span>{formatDate(item.createdAt)}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-3 h-3 text-slate-500" />
-                            <span>{item.views || 0}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-
-              {/* Ver Todas Button */}
-              <div className="text-center mt-10">
-                <button
-                  onClick={() => router.push('/noticias')}
-                  className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-colors cursor-pointer"
-                >
-                  Ver Todas
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </button>
-              </div>
-            </>
-          )}
+    <section id="noticias" className="py-20 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="mb-12">
+          <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
+            Notícias
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+            Últimas <span className="text-party-blue">Notícias</span>
+          </h2>
         </div>
-      </section>
-    </>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-party-blue" />
+          </div>
+        ) : (
+          <>
+            {/* Grid de Notícias - Todas com mesma altura, sem espaços vazios */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {news.slice(0, 6).map((item) => (
+                <Card
+                  key={item.id}
+                  className="rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 flex flex-col h-full"
+                  onClick={() => handleNewsClick(item)}
+                >
+                  <div className="h-48 relative overflow-hidden flex-shrink-0">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-blue-gradient" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
+                      {categoryLabels[item.category] || item.category}
+                    </span>
+                  </div>
+                  <CardContent className="p-4 flex flex-col flex-grow">
+                    <h3 className="text-lg font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2 line-clamp-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2 flex-grow">
+                      {item.summary}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto pt-2 border-t border-gray-100">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3 text-slate-500" />
+                        <span>{formatDate(item.createdAt)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <User className="w-3 h-3 text-slate-500" />
+                          <span className="hidden sm:inline">{item.author}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="w-3 h-3 text-slate-500" />
+                          <span>{item.views || 0}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Ver Todas Button */}
+            <div className="text-center mt-10">
+              <button
+                onClick={() => router.push('/noticias')}
+                className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-colors cursor-pointer"
+              >
+                Ver Todas
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }
