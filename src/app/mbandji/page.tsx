@@ -1188,16 +1188,44 @@ function SubscribersList({ subscribers, onDelete }: { subscribers: Subscriber[];
 }
 
 function SettingsForm({ siteConfig, setSiteConfig, saving, onSave, uploadingImage, handleImageUpload, handleConfigImageUpload, fileInputRef, onHeroImageChange, hasUnsavedChanges, setHasUnsavedChanges }: any) {
+  
+  const updateConfig = (field: string, value: any) => {
+    setSiteConfig({ ...siteConfig, [field]: value })
+    setHasUnsavedChanges(true)
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 pb-8">
+      {/* Botão Salvar Flutuante */}
+      {hasUnsavedChanges && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <Button 
+            onClick={() => onSave()} 
+            disabled={saving}
+            className="bg-emerald-600 hover:bg-emerald-700 shadow-lg"
+          >
+            {saving ? (
+              <><ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+            ) : (
+              <><CheckCircleIcon className="w-4 h-4 mr-2" /> Salvar Alterações</>
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* Seção Hero */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Configurações do Site</CardTitle>
+          <CardTitle className="text-base md:text-lg flex items-center gap-2">
+            <PhotoIcon className="w-5 h-5" />
+            Seção Hero (Início)
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Imagem do Hero */}
           <div>
-            <Label className="text-sm">Imagem do Hero</Label>
-            <p className="text-xs text-slate-500 mb-2">Imagem principal que aparece no topo da página inicial</p>
+            <Label className="text-sm">Imagem de Fundo</Label>
+            <p className="text-xs text-slate-500 mb-2">Imagem principal que aparece no topo da página</p>
             <div className="flex items-center gap-4">
               <div className="w-24 h-16 bg-slate-100 rounded-lg overflow-hidden">
                 {siteConfig?.heroImage ? (
@@ -1220,13 +1248,251 @@ function SettingsForm({ siteConfig, setSiteConfig, saving, onSave, uploadingImag
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingImage}
                 size="sm"
+                type="button"
               >
                 {uploadingImage ? <ArrowPathIcon className="w-4 h-4 animate-spin" /> : 'Carregar'}
               </Button>
             </div>
           </div>
+
+          <div>
+            <Label className="text-sm">Badge (Etiqueta)</Label>
+            <Input
+              value={siteConfig?.heroBadge || ''}
+              onChange={(e) => updateConfig('heroBadge', e.target.value)}
+              placeholder="Eleições 2025 - Juntos pelo Futuro de Angola"
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label className="text-sm">Título Principal</Label>
+            <Input
+              value={siteConfig?.heroTitle || ''}
+              onChange={(e) => updateConfig('heroTitle', e.target.value)}
+              placeholder="Construindo um Angola Melhor para Todos"
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label className="text-sm">Subtítulo</Label>
+            <textarea
+              value={siteConfig?.heroSubtitle || ''}
+              onChange={(e) => updateConfig('heroSubtitle', e.target.value)}
+              placeholder="Descrição curta sobre o partido..."
+              rows={3}
+              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm">Texto do Botão 1</Label>
+              <Input
+                value={siteConfig?.heroButtonText1 || ''}
+                onChange={(e) => updateConfig('heroButtonText1', e.target.value)}
+                placeholder="Seja Voluntário"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Link do Botão 1</Label>
+              <Input
+                value={siteConfig?.heroButtonLink1 || ''}
+                onChange={(e) => updateConfig('heroButtonLink1', e.target.value)}
+                placeholder="#voluntarios"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm">Texto do Botão 2</Label>
+              <Input
+                value={siteConfig?.heroButtonText2 || ''}
+                onChange={(e) => updateConfig('heroButtonText2', e.target.value)}
+                placeholder="Conheça Nosso Programa"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Link do Botão 2</Label>
+              <Input
+                value={siteConfig?.heroButtonLink2 || ''}
+                onChange={(e) => updateConfig('heroButtonLink2', e.target.value)}
+                placeholder="#programa"
+                className="mt-1"
+              />
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Seção Estatísticas */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base md:text-lg">Estatísticas do Hero</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label className="text-sm">Valor Stat 1</Label>
+              <Input
+                value={siteConfig?.stat1Value || ''}
+                onChange={(e) => updateConfig('stat1Value', e.target.value)}
+                placeholder="15K+"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Label Stat 1</Label>
+              <Input
+                value={siteConfig?.stat1Label || ''}
+                onChange={(e) => updateConfig('stat1Label', e.target.value)}
+                placeholder="Voluntários Ativos"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Valor Stat 2</Label>
+              <Input
+                value={siteConfig?.stat2Value || ''}
+                onChange={(e) => updateConfig('stat2Value', e.target.value)}
+                placeholder="18"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Label Stat 2</Label>
+              <Input
+                value={siteConfig?.stat2Label || ''}
+                onChange={(e) => updateConfig('stat2Label', e.target.value)}
+                placeholder="Províncias"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <Label className="text-sm">Valor Stat 3</Label>
+              <Input
+                value={siteConfig?.stat3Value || ''}
+                onChange={(e) => updateConfig('stat3Value', e.target.value)}
+                placeholder="50+"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Label Stat 3</Label>
+              <Input
+                value={siteConfig?.stat3Label || ''}
+                onChange={(e) => updateConfig('stat3Label', e.target.value)}
+                placeholder="Eventos"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Valor Stat 4</Label>
+              <Input
+                value={siteConfig?.stat4Value || ''}
+                onChange={(e) => updateConfig('stat4Value', e.target.value)}
+                placeholder="100K+"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label className="text-sm">Label Stat 4</Label>
+              <Input
+                value={siteConfig?.stat4Label || ''}
+                onChange={(e) => updateConfig('stat4Label', e.target.value)}
+                placeholder="Apoiantes"
+                className="mt-1"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Seção Partido */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base md:text-lg">Seção "O Partido"</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm">Subtítulo</Label>
+            <Input
+              value={siteConfig?.partySubtitle || ''}
+              onChange={(e) => updateConfig('partySubtitle', e.target.value)}
+              placeholder="O Partido"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm">Título</Label>
+            <Input
+              value={siteConfig?.partyTitle || ''}
+              onChange={(e) => updateConfig('partyTitle', e.target.value)}
+              placeholder="Conheça o Partido Liberal"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm">Descrição</Label>
+            <textarea
+              value={siteConfig?.partyDescription || ''}
+              onChange={(e) => updateConfig('partyDescription', e.target.value)}
+              placeholder="Descrição sobre o partido..."
+              rows={4}
+              className="mt-1 w-full border rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Seção Vídeo */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base md:text-lg">Vídeo Institucional</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm">Título do Vídeo</Label>
+            <Input
+              value={siteConfig?.videoTitle || ''}
+              onChange={(e) => updateConfig('videoTitle', e.target.value)}
+              placeholder="Vídeo Institucional"
+              className="mt-1"
+            />
+          </div>
+          <div>
+            <Label className="text-sm">URL do Vídeo (YouTube/Vimeo)</Label>
+            <Input
+              value={siteConfig?.videoUrl || ''}
+              onChange={(e) => updateConfig('videoUrl', e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="mt-1"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Botão Salvar */}
+      <div className="flex justify-end">
+        <Button 
+          onClick={() => onSave()} 
+          disabled={saving}
+          className="bg-emerald-600 hover:bg-emerald-700"
+        >
+          {saving ? (
+            <><ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" /> Salvando...</>
+          ) : (
+            <><CheckCircleIcon className="w-4 h-4 mr-2" /> Salvar Configurações</>
+          )}
+        </Button>
+      </div>
     </div>
   )
 }
