@@ -101,7 +101,7 @@ export function ComplaintsSection() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge className="bg-slate-100 text-slate-700 mb-4">
+          <Badge className="bg-blue-100 text-blue-700 mb-4">
             Ouvidoria
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -122,14 +122,14 @@ export function ComplaintsSection() {
                 key={type.value}
                 className={`cursor-pointer transition-all ${
                   formData.type === type.value
-                    ? "border-slate-800 border-2 shadow-md"
-                    : "border hover:border-slate-300"
+                    ? "border-blue-600 border-2 shadow-md"
+                    : "border hover:border-blue-300"
                 }`}
                 onClick={() => setFormData({ ...formData, type: type.value })}
               >
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <type.icon className="h-5 w-5 text-slate-600" />
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <type.icon className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">{type.label}</h4>
@@ -139,10 +139,10 @@ export function ComplaintsSection() {
             ))}
 
             {/* Privacy Info */}
-            <Card className="bg-slate-50 border-slate-200 mt-6">
+            <Card className="bg-blue-50 border-blue-200 mt-6">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-slate-600 mt-0.5" />
+                  <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
                     <h4 className="font-medium text-foreground text-sm">Sigilo Garantido</h4>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -158,14 +158,14 @@ export function ComplaintsSection() {
           {/* Form */}
           <div className="lg:col-span-2">
             <Card className="border-0 shadow-lg">
-              <CardHeader className="bg-slate-800 text-white rounded-t-lg">
+              <CardHeader className="bg-blue-gradient text-white rounded-t-lg">
                 <h3 className="text-xl font-semibold">Envie sua Mensagem</h3>
               </CardHeader>
               <CardContent className="p-6">
                 {isSuccess ? (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle className="h-8 w-8 text-slate-600" />
+                    <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="h-8 w-8 text-blue-600" />
                     </div>
                     <h4 className="text-xl font-semibold text-foreground mb-2">
                       Mensagem Enviada!
@@ -226,7 +226,7 @@ export function ComplaintsSection() {
                             phone: !isAnonymous ? "" : formData.phone,
                           });
                         }}
-                        className={isAnonymous ? "bg-slate-700 hover:bg-slate-800" : ""}
+                        className={isAnonymous ? "bg-blue-600 hover:bg-blue-700" : ""}
                       >
                         {isAnonymous ? "Anônimo" : "Identificado"}
                       </Button>

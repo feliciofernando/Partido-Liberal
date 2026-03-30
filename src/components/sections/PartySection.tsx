@@ -138,7 +138,7 @@ export function PartySection() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left - Video/Image */}
             <div className="relative">
-              <div className="aspect-video rounded-2xl overflow-hidden bg-slate-800 flex items-center justify-center shadow-lg">
+              <div className="aspect-video rounded-2xl overflow-hidden bg-blue-gradient flex items-center justify-center shadow-lg">
                 {config.videoUrl ? (
                   <button
                     onClick={() => setShowVideo(true)}
@@ -153,7 +153,7 @@ export function PartySection() {
                     )}
                     <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                       <div className="w-20 h-20 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                        <Play className="w-10 h-10 text-slate-700 ml-1" />
+                        <Play className="w-10 h-10 text-party-blue ml-1" />
                       </div>
                     </div>
                     <p className="absolute bottom-4 left-4 text-white font-medium">
@@ -170,7 +170,7 @@ export function PartySection() {
                 )}
               </div>
               {/* Decorative Element */}
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-slate-200 rounded-lg -z-10" />
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-blue-100 rounded-lg -z-10" />
             </div>
 
             {/* Right - Values */}
@@ -218,14 +218,14 @@ export function PartySection() {
                   >
                     <div className={`w-full md:w-1/2 ${index % 2 === 0 ? "md:pr-12 md:text-right" : "md:pl-12"}`}>
                       <div className="bg-white p-6 rounded-xl shadow-sm border inline-block">
-                        <Badge className="bg-slate-700 text-white mb-2">
+                        <Badge className="bg-blue-600 text-white mb-2">
                           {item.year}
                         </Badge>
                         <h4 className="font-semibold text-foreground mb-1">{item.title}</h4>
                         <p className="text-sm text-muted-foreground">{item.desc}</p>
                       </div>
                     </div>
-                    <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-slate-600 border-4 border-white shadow" />
+                    <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-blue-500 border-4 border-white shadow" />
                   </div>
                 ))}
               </div>

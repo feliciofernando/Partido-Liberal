@@ -36,14 +36,14 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg logo-gradient shadow-md">
             <BuildingLibraryIcon className="h-6 w-6 text-white" />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-slate-800 leading-tight">
+            <span className="text-lg font-bold text-foreground leading-tight">
               PARTIDO LIBERAL
             </span>
-            <span className="text-xs text-slate-500 leading-tight">
+            <span className="text-xs text-muted-foreground leading-tight">
               Construindo o Futuro
             </span>
           </div>
@@ -91,14 +91,14 @@ export function Header() {
             <div className="flex flex-col gap-6 mt-8">
               {/* Mobile Logo */}
               <div className="flex items-center gap-3 pb-4 border-b">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg logo-gradient shadow-md">
                   <BuildingLibraryIcon className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold text-slate-800 leading-tight">
+                  <span className="text-lg font-bold text-foreground leading-tight">
                     PARTIDO LIBERAL
                   </span>
-                  <span className="text-xs text-slate-500 leading-tight">
+                  <span className="text-xs text-muted-foreground leading-tight">
                     Construindo o Futuro
                   </span>
                 </div>

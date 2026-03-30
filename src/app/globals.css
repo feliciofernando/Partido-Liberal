@@ -218,6 +218,34 @@
   background: linear-gradient(135deg, oklch(0.45 0.18 250) 0%, oklch(0.35 0.15 250) 100%);
 }
 
+/* Blue gradient backgrounds - Partido Liberal */
+.bg-blue-gradient {
+  background: linear-gradient(135deg, oklch(0.45 0.18 250) 0%, oklch(0.35 0.18 260) 50%, oklch(0.30 0.16 250) 100%);
+}
+
+.bg-blue-gradient-light {
+  background: linear-gradient(135deg, oklch(0.55 0.18 250) 0%, oklch(0.45 0.18 260) 100%);
+}
+
+.bg-blue-gradient-dark {
+  background: linear-gradient(135deg, oklch(0.40 0.18 250) 0%, oklch(0.30 0.18 260) 50%, oklch(0.25 0.14 250) 100%);
+}
+
+/* Footer gradient */
+.footer-gradient {
+  background: linear-gradient(180deg, oklch(0.35 0.18 250) 0%, oklch(0.25 0.14 250) 100%);
+}
+
+/* Card blue gradient */
+.card-blue-gradient {
+  background: linear-gradient(145deg, oklch(0.45 0.18 250) 0%, oklch(0.35 0.16 255) 100%);
+}
+
+/* Logo gradient */
+.logo-gradient {
+  background: linear-gradient(135deg, oklch(0.50 0.18 250) 0%, oklch(0.40 0.18 255) 100%);
+}
+
 /* Card hover effect */
 .card-hover {
   transition: all 0.3s ease;

@@ -204,7 +204,7 @@ export function EventsSection() {
         <div className="container mx-auto px-4">
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <Badge className="bg-slate-100 text-slate-700 mb-4">
+            <Badge className="bg-blue-100 text-blue-700 mb-4">
               Agenda
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -238,7 +238,7 @@ export function EventsSection() {
                   className="card-hover border-0 shadow-md overflow-hidden"
                 >
                   {/* Date Header */}
-                  <div className="bg-slate-800 text-white p-4 flex items-center justify-between">
+                  <div className="bg-blue-gradient text-white p-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 rounded-lg bg-white/10 flex flex-col items-center justify-center">
                         <span className="text-xl font-bold">
@@ -282,7 +282,7 @@ export function EventsSection() {
                     </div>
 
                     {/* Province Badge */}
-                    <Badge variant="outline" className="border-slate-200 text-slate-600">
+                    <Badge variant="outline" className="border-blue-200 text-blue-700">
                       {event.province}
                     </Badge>
 
@@ -292,7 +292,7 @@ export function EventsSection() {
                       disabled={confirming === event.id}
                       className={`w-full ${
                         confirmedEvents.includes(event.id)
-                          ? "bg-slate-700 hover:bg-slate-800"
+                          ? "bg-blue-600 hover:bg-blue-700"
                           : "btn-cta"
                       }`}
                     >
@@ -320,7 +320,7 @@ export function EventsSection() {
           <div className="text-center mt-12">
             <Button 
               variant="outline" 
-              className="border-slate-300 text-slate-700"
+              className="border-blue-300 text-blue-700 hover:bg-blue-50"
               onClick={() => setShowCalendar(true)}
             >
               <Calendar className="mr-2 h-4 w-4" />
@@ -335,7 +335,7 @@ export function EventsSection() {
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
-              <CalendarDays className="w-5 h-5 text-slate-600" />
+              <CalendarDays className="w-5 h-5 text-blue-600" />
               Calendário Completo de Eventos
             </DialogTitle>
           </DialogHeader>
@@ -346,7 +346,7 @@ export function EventsSection() {
               variant={selectedProvince === null ? "default" : "outline"}
               size="sm"
               onClick={() => setSelectedProvince(null)}
-              className={selectedProvince === null ? "bg-slate-800 hover:bg-slate-900" : ""}
+              className={selectedProvince === null ? "bg-blue-600 hover:bg-blue-700" : ""}
             >
               Todas as Províncias
             </Button>
@@ -356,7 +356,7 @@ export function EventsSection() {
                 variant={selectedProvince === province ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedProvince(province)}
-                className={selectedProvince === province ? "bg-slate-800 hover:bg-slate-900" : ""}
+                className={selectedProvince === province ? "bg-blue-600 hover:bg-blue-700" : ""}
               >
                 {province}
               </Button>
@@ -377,7 +377,7 @@ export function EventsSection() {
               Object.entries(groupedEvents).map(([key, group]) => (
                 <div key={key} className="mb-8">
                   <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-slate-500" />
+                    <Calendar className="w-5 h-5 text-blue-500" />
                     {group.label}
                   </h3>
                   <div className="space-y-3">
@@ -388,7 +388,7 @@ export function EventsSection() {
                       >
                         <CardContent className="p-4">
                           <div className="flex gap-4">
-                            <div className="flex flex-col items-center justify-center w-16 h-16 rounded-lg bg-slate-100 text-slate-700">
+                            <div className="flex flex-col items-center justify-center w-16 h-16 rounded-lg bg-blue-100 text-blue-700">
                               <span className="text-2xl font-bold">
                                 {new Date(event.date).getDate()}
                               </span>
@@ -406,21 +406,21 @@ export function EventsSection() {
                                     {event.description}
                                   </p>
                                 </div>
-                                <Badge className="bg-white/20 text-slate-700 border border-slate-200 ml-2">
+                                <Badge className="bg-white/20 text-blue-700 border border-blue-200 ml-2">
                                   {typeLabels[event.type] || event.type}
                                 </Badge>
                               </div>
                               <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
-                                  <Clock className="w-4 h-4 text-slate-500" />
+                                  <Clock className="w-4 h-4 text-blue-500" />
                                   <span>{event.time}h</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <MapPin className="w-4 h-4 text-slate-500" />
+                                  <MapPin className="w-4 h-4 text-blue-500" />
                                   <span>{event.location}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4 text-slate-500" />
+                                  <Users className="w-4 h-4 text-blue-500" />
                                   <span>{formatNumber(event.attendees || 0)}</span>
                                 </div>
                                 <Badge variant="outline" className="text-xs">

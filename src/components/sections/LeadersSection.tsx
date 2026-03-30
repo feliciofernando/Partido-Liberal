@@ -189,7 +189,7 @@ export function LeadersSection() {
                   onClick={() => setSelectedLeader(leader)}
                 >
                   {/* Photo Area */}
-                  <div className="h-48 bg-party-blue flex items-center justify-center relative overflow-hidden">
+                  <div className="h-48 card-blue-gradient flex items-center justify-center relative overflow-hidden">
                     {leader.photo ? (
                       <img
                         src={leader.photo}
@@ -209,7 +209,7 @@ export function LeadersSection() {
                   </div>
 
                   <div className="p-6">
-                    <span className="inline-block px-3 py-1 border border-slate-200 text-slate-600 text-xs font-medium rounded-full mb-2">
+                    <span className="inline-block px-3 py-1 border border-blue-200 text-blue-700 text-xs font-medium rounded-full mb-2">
                       {leader.role}
                     </span>
                     <h3 className="text-xl font-semibold text-foreground group-hover:text-party-blue transition-colors">
@@ -224,7 +224,7 @@ export function LeadersSection() {
           <div className="text-center mt-12">
             <Button 
               variant="outline" 
-              className="border-slate-300 text-slate-700"
+              className="border-blue-300 text-blue-700 hover:bg-blue-50"
               onClick={() => router.push('/lideres')}
             >
               Ver Todos os Candidatos
@@ -246,7 +246,7 @@ export function LeadersSection() {
               <div className="space-y-6">
                 {/* Header with Photo */}
                 <div className="flex flex-col sm:flex-row items-center gap-6">
-                  <div className="w-32 h-32 rounded-full overflow-hidden bg-party-blue flex items-center justify-center flex-shrink-0">
+                  <div className="w-32 h-32 rounded-full overflow-hidden card-blue-gradient flex items-center justify-center flex-shrink-0">
                     {selectedLeader.photo ? (
                       <img
                         src={selectedLeader.photo}
@@ -260,7 +260,7 @@ export function LeadersSection() {
                     )}
                   </div>
                   <div className="text-center sm:text-left">
-                    <Badge className="bg-slate-100 text-slate-700 mb-2">
+                    <Badge className="bg-blue-100 text-blue-700 mb-2">
                       {selectedLeader.role}
                     </Badge>
                     <h2 className="text-2xl font-bold text-foreground">
@@ -278,7 +278,7 @@ export function LeadersSection() {
                 {/* Bio */}
                 <div>
                   <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                    <User className="w-5 h-5 text-slate-500" />
+                    <User className="w-5 h-5 text-blue-500" />
                     Biografia
                   </h3>
                   <p className="text-muted-foreground">
@@ -290,7 +290,7 @@ export function LeadersSection() {
                 {selectedLeader.proposals && (
                   <div>
                     <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-slate-500" />
+                      <FileText className="w-5 h-5 text-blue-500" />
                       Propostas
                     </h3>
                     <p className="text-muted-foreground">
@@ -302,7 +302,7 @@ export function LeadersSection() {
                 {/* Social Networks */}
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <Globe className="w-5 h-5 text-slate-500" />
+                    <Globe className="w-5 h-5 text-blue-500" />
                     Redes Sociais
                   </h3>
                   <div className="flex flex-wrap gap-3">

@@ -183,7 +183,7 @@ export function NewsSection() {
       <section id="noticias" className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="mb-12">
-            <span className="inline-block px-4 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full mb-4">
+            <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
               Notícias
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground">
@@ -215,10 +215,10 @@ export function NewsSection() {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-slate-700 to-slate-900" />
+                        <div className="w-full h-full bg-blue-gradient" />
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-slate-700">
+                      <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
                         {categoryLabels[item.category] || item.category}
                       </span>
                     </div>
@@ -280,9 +280,9 @@ export function NewsSection() {
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800" />
+                          <div className="w-full h-full bg-blue-gradient-light" />
                         )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs bg-white/90 text-slate-700">
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded text-xs bg-white/90 text-blue-700">
                           {categoryLabels[item.category] || item.category}
                         </span>
                       </div>
@@ -310,7 +310,7 @@ export function NewsSection() {
               <div className="text-center mt-10">
                 <button
                   onClick={() => router.push('/noticias')}
-                  className="inline-flex items-center px-6 py-3 border border-slate-300 text-slate-700 hover:bg-slate-800 hover:text-white rounded-lg transition-colors cursor-pointer"
+                  className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-colors cursor-pointer"
                 >
                   Ver Todas
                   <ArrowRight className="w-4 h-4 ml-2" />

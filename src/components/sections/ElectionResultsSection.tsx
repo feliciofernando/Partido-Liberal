@@ -54,7 +54,7 @@ export function ElectionResultsSection() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <Badge className="bg-slate-100 text-slate-700 mb-4">
+          <Badge className="bg-blue-100 text-blue-700 mb-4">
             <BarChart3 className="h-3 w-3 mr-1" />
             Resultados
           </Badge>
@@ -73,8 +73,8 @@ export function ElectionResultsSection() {
             <AccordionItem value="resultados" className="border-0">
               <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/50 bg-white">
                 <div className="flex items-center gap-4 w-full">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-slate-600" />
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="text-left flex-1">
                     <span className="font-semibold text-foreground text-lg">
@@ -84,7 +84,7 @@ export function ElectionResultsSection() {
                       Clique para expandir e ver os dados detalhados por província
                     </p>
                   </div>
-                  <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
                     Em breve
                   </Badge>
                 </div>
@@ -92,7 +92,7 @@ export function ElectionResultsSection() {
               <AccordionContent className="px-0 pb-0">
                 {/* Status Banner */}
                 <div className="px-6 pb-4">
-                  <Card className="mb-6 border-0 shadow-md bg-slate-800 text-white">
+                  <Card className="mb-6 border-0 shadow-md bg-blue-gradient text-white">
                     <CardContent className="p-5">
                       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
@@ -121,28 +121,28 @@ export function ElectionResultsSection() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
-                        <TrendingUp className="h-7 w-7 text-slate-600 mx-auto mb-2" />
+                        <TrendingUp className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">{avgPercentage}%</div>
                         <div className="text-xs text-muted-foreground">Média Nacional</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
-                        <Users className="h-7 w-7 text-slate-600 mx-auto mb-2" />
+                        <Users className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">270K</div>
                         <div className="text-xs text-muted-foreground">Votos Apurados</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
-                        <MapPin className="h-7 w-7 text-slate-600 mx-auto mb-2" />
+                        <MapPin className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">18</div>
                         <div className="text-xs text-muted-foreground">Províncias</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
-                        <Clock className="h-7 w-7 text-slate-600 mx-auto mb-2" />
+                        <Clock className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">85%</div>
                         <div className="text-xs text-muted-foreground">Mesas Apuradas</div>
                       </CardContent>
@@ -163,18 +163,18 @@ export function ElectionResultsSection() {
                               <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-muted-foreground w-6">{index + 1}</span>
                                 <span className="font-medium text-foreground">{result.province}</span>
-                                <Badge variant="outline" className="text-xs border-slate-200 text-slate-600">
+                                <Badge variant="outline" className="text-xs border-blue-200 text-blue-600">
                                   {result.reported}% apurado
                                 </Badge>
                               </div>
                               <div className="text-right">
-                                <span className="font-bold text-slate-800 text-lg">{result.percentage}%</span>
+                                <span className="font-bold text-blue-700 text-lg">{result.percentage}%</span>
                                 <p className="text-xs text-muted-foreground">
                                   {formatVotes(result.votes)} votos
                                 </p>
                               </div>
                             </div>
-                            <Progress value={result.percentage} className="h-2 bg-slate-100" />
+                            <Progress value={result.percentage} className="h-2 bg-blue-100" />
                           </div>
                         ))}
                       </div>
@@ -182,9 +182,9 @@ export function ElectionResultsSection() {
                   </Card>
 
                   {/* Disclaimer */}
-                  <div className="mt-6 p-4 bg-slate-100 border border-slate-200 rounded-lg">
-                    <p className="text-sm text-slate-700 flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-slate-500" />
+                  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-700 flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-500" />
                       Estes são dados preliminares apurados pelos fiscais do Partido Liberal.
                       Os resultados oficiais serão divulgados pela Comissão Nacional Eleitoral.
                     </p>

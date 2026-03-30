@@ -71,7 +71,7 @@ export function KitSection() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <Badge className="bg-slate-100 text-slate-700 mb-4">
+          <Badge className="bg-blue-100 text-blue-700 mb-4">
             Kit Digital
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -89,8 +89,8 @@ export function KitSection() {
             <AccordionItem value="kit" className="border-0">
               <AccordionTrigger className="px-6 py-5 hover:no-underline hover:bg-muted/50 bg-white">
                 <div className="flex items-center gap-4 w-full">
-                  <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
-                    <Package className="h-6 w-6 text-slate-600" />
+                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                    <Package className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="text-left flex-1">
                     <span className="font-semibold text-foreground text-lg">
@@ -100,7 +100,7 @@ export function KitSection() {
                       Clique para expandir e ver todos os materiais para download
                     </p>
                   </div>
-                  <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
                     {kitItems.length} itens
                   </Badge>
                 </div>
@@ -144,7 +144,7 @@ export function KitSection() {
                                 })()}
                               </div>
                             )}
-                            <Badge className="absolute top-3 right-3 bg-white text-slate-700 border border-slate-200">
+                            <Badge className="absolute top-3 right-3 bg-white text-blue-700 border border-blue-200">
                               {typeLabels[item.type] || item.type}
                             </Badge>
                           </div>
@@ -185,7 +185,7 @@ export function KitSection() {
                   )}
 
                   {/* Share CTA */}
-                  <Card className="mt-6 bg-gradient-to-r from-slate-800 to-slate-900 text-white border-0">
+                  <Card className="mt-6 bg-blue-gradient text-white border-0">
                     <CardContent className="p-6 text-center">
                       <Share2 className="h-10 w-10 mx-auto mb-3 opacity-80" />
                       <h3 className="text-lg font-semibold mb-2">Compartilhe nas Redes Sociais</h3>
@@ -193,13 +193,13 @@ export function KitSection() {
                         Use nossos materiais para mostrar seu apoio ao Partido Liberal.
                       </p>
                       <div className="flex flex-wrap justify-center gap-2">
-                        <Button size="sm" className="bg-white text-slate-800 hover:bg-white/90">
+                        <Button size="sm" className="bg-white text-blue-700 hover:bg-white/90">
                           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                           </svg>
                           Facebook
                         </Button>
-                        <Button size="sm" className="bg-white text-slate-800 hover:bg-white/90">
+                        <Button size="sm" className="bg-white text-blue-700 hover:bg-white/90">
                           <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                           </svg>

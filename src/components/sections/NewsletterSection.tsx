@@ -55,7 +55,7 @@ export function NewsletterSection() {
         <Card className="border-0 shadow-lg overflow-hidden">
           <div className="grid lg:grid-cols-2">
             {/* Left Side - Info */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-900 p-8 lg:p-12 text-white">
+            <div className="bg-blue-gradient p-8 lg:p-12 text-white">
               <Badge className="bg-white/10 text-white border-white/20 mb-4">
                 <Bell className="h-3 w-3 mr-1" />
                 Newsletter

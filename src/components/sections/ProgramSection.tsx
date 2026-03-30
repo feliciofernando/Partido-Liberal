@@ -129,7 +129,7 @@ export function ProgramSection() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge className="bg-slate-100 text-slate-700 mb-4">
+          <Badge className="bg-blue-100 text-blue-700 mb-4">
             Programa de Governo
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -149,8 +149,8 @@ export function ProgramSection() {
               className="card-hover border-0 shadow-sm cursor-pointer overflow-hidden"
             >
               <CardContent className="p-6">
-                <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
-                  <area.icon className="h-6 w-6 text-slate-600" />
+                <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mb-4">
+                  <area.icon className="h-6 w-6 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{area.title}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-2">{area.summary}</p>
@@ -167,8 +167,8 @@ export function ProgramSection() {
                 <AccordionItem key={area.id} value={area.id} className="border-b last:border-0">
                   <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <area.icon className="h-5 w-5 text-slate-600" />
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <area.icon className="h-5 w-5 text-blue-600" />
                       </div>
                       <div className="text-left">
                         <span className="font-semibold text-foreground">{area.title}</span>
@@ -180,7 +180,7 @@ export function ProgramSection() {
                     <div className="ml-14 space-y-3">
                       {area.points.map((point, i) => (
                         <div key={i} className="flex items-start gap-3">
-                          <div className="w-2 h-2 rounded-full bg-slate-400 mt-2" />
+                          <div className="w-2 h-2 rounded-full bg-blue-400 mt-2" />
                           <p className="text-muted-foreground">{point}</p>
                         </div>
                       ))}

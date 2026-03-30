@@ -130,7 +130,7 @@ export function VolunteersSection() {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <Badge className="bg-slate-100 text-slate-700 mb-4">
+          <Badge className="bg-blue-100 text-blue-700 mb-4">
             Junte-se a Nós
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -148,8 +148,8 @@ export function VolunteersSection() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-slate-600" />
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Voluntário de Campanha</h3>
@@ -168,8 +168,8 @@ export function VolunteersSection() {
             <Card className="border-0 shadow-md">
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center">
-                    <Shield className="h-6 w-6 text-slate-600" />
+                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Fiscal de Mesa</h3>
@@ -187,13 +187,13 @@ export function VolunteersSection() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4">
-              <Card className="bg-slate-800 text-white border-0">
+              <Card className="bg-blue-gradient text-white border-0">
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold mb-1">{formatNumber(stats.total)}</div>
                   <div className="text-white/80 text-sm">Voluntários Ativos</div>
                 </CardContent>
               </Card>
-              <Card className="bg-slate-700 text-white border-0">
+              <Card className="bg-blue-gradient-dark text-white border-0">
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold mb-1">{formatNumber(stats.fiscals)}</div>
                   <div className="text-white/80 text-sm">Fiscais Treinados</div>
@@ -213,7 +213,7 @@ export function VolunteersSection() {
                   "Material de apoio gratuito",
                 ].map((benefit, i) => (
                   <li key={i} className="flex items-center gap-3 text-muted-foreground">
-                    <CheckCircle className="h-5 w-5 text-slate-600 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0" />
                     {benefit}
                   </li>
                 ))}
@@ -223,15 +223,15 @@ export function VolunteersSection() {
 
           {/* Form */}
           <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-slate-800 text-white rounded-t-lg">
+            <CardHeader className="bg-blue-gradient text-white rounded-t-lg">
               <h3 className="text-xl font-semibold">Formulário de Cadastro</h3>
               <p className="text-white/80 text-sm">Preencha seus dados para participar</p>
             </CardHeader>
             <CardContent className="p-6">
               {isSuccess ? (
                 <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="h-8 w-8 text-slate-600" />
+                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="h-8 w-8 text-blue-600" />
                   </div>
                   <h4 className="text-xl font-semibold text-foreground mb-2">
                     Cadastro Realizado!
