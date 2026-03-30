@@ -50,7 +50,7 @@ export async function GET() {
 
 function getDefaultConfig() {
   return {
-    heroImage: '/hero-bg.png',
+    heroImage: '',
     heroBadge: 'Eleições 2025 - Juntos pelo Futuro de Angola',
     heroTitle: 'Construindo um Angola Melhor para Todos',
     heroSubtitle: 'O Partido Liberal é a voz da mudança, da liberdade e do progresso. Junte-se a nós nesta jornada rumo a um futuro próspero e justo para todos os angolanos.',
