@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Noticias do site
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  summary     String?
+  content     String?
+  image       String?
+  category    String   @default("politica")
+  featured    Boolean  @default(false)
+  published   Boolean  @default(false)
+  author      String?
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("News")
+}
+
+// Lideranca do partido
+model Leader {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  role            String
+  province        String?
+  bio             String?
+  photo           String?
+  proposals       String?
+  socialFacebook  String?
+  socialTwitter   String?
+  socialInstagram String?
+  socialLinkedin  String?
+  order           Int      @default(0)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("Leader")
+}
+
+// Eventos e agenda
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  location    String?
+  province    String?
+  date        DateTime
+  time        String?
+  image       String?
+  type        String   @default("outro")
+  status      String   @default("agendado")
+  attendees   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("Event")
+}
+
+// Programa de governo
+model GovernmentProgram {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  area      String?
+  summary   String?
+  content   String?
+  icon      String?
+  order     Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("GovernmentProgram")
+}
+
+// Kit digital - materiais para militancia
+model KitItem {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  type        String   @default("documento")
+  fileUrl     String?
+  thumbnail   String?
+  downloads   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("KitItem")
+}
+
+// Voluntarios
+model Volunteer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  province  String?
+  message   String?
+  status    String   @default("pendente")
+  isFiscal  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Volunteer")
+}
+
+// Ouvidoria - denuncias, reclamacoes, sugestoes
+model Complaint {
+  id        String   @id @default(uuid())
+  type      String
+  subject   String?
+  message   String
+  email     String?
+  phone     String?
+  province  String?
+  status    String   @default("pendente")
+  response  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Complaint")
+}
+
+// Newsletter
+model Subscriber {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Subscriber")
+}
+
+// Alertas e comunicados
+model Alert {
+  id        String   @id @default(uuid())
+  title     String
+  message   String?
+  type      String   @default("info")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("Alert")
+}
+
+// Configuracoes do site (hero, video, textos)
+model SiteConfig {
+  id              String   @id @default(uuid())
+  // Hero Section
+  heroImage       String?
+  heroBadge       String?
+  heroTitle       String?
+  heroSubtitle    String?
+  heroButtonText1 String?
+  heroButtonLink1 String?
+  heroButtonText2 String?
+  heroButtonLink2 String?
+  // Stats
+  stat1Value      String?
+  stat1Label      String?
+  stat2Value      String?
+  stat2Label      String?
+  stat3Value      String?
+  stat3Label      String?
+  stat4Value      String?
+  stat4Label      String?
+  // Video Institucional
+  videoUrl        String?
+  videoTitle      String?
+  // Party Section
+  partyDescription String?
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("SiteConfig")
+}

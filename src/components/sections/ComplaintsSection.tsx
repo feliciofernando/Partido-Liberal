@@ -1,0 +1,353 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  MessageSquare,
+  AlertTriangle,
+  Lightbulb,
+  HelpCircle,
+  Send,
+  Loader2,
+  CheckCircle,
+  Shield,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+const complaintTypes = [
+  { value: "sugestao", label: "Sugestão", icon: Lightbulb },
+  { value: "denuncia", label: "Denúncia", icon: AlertTriangle },
+  { value: "reclamacao", label: "Reclamação", icon: MessageSquare },
+  { value: "informacao", label: "Pedido de Informação", icon: HelpCircle },
+];
+
+const provinces = [
+  "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango",
+  "Cuanza Norte", "Cuanza Sul", "Cunene", "Huambo", "Huíla",
+  "Luanda", "Lunda Norte", "Lunda Sul", "Malanje", "Moxico",
+  "Namibe", "Uíge", "Zaire"
+];
+
+export function ComplaintsSection() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [formData, setFormData] = useState({
+    type: "",
+    name: "",
+    email: "",
+    phone: "",
+    province: "",
+    subject: "",
+    message: "",
+    anonymous: false,
+  });
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("/api/complaints", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          anonymous: isAnonymous,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Erro ao enviar mensagem");
+      }
+
+      setIsSuccess(true);
+      toast({
+        title: "Mensagem enviada com sucesso!",
+        description: isAnonymous
+          ? "Sua mensagem anônima foi registrada. Obrigado!"
+          : "Entraremos em contato em breve. Obrigado!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro no envio",
+        description: error.message || "Ocorreu um erro. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <section id="ouvidoria" className="py-20 bg-white">
+      <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <Badge className="bg-slate-100 text-slate-700 mb-4">
+            Ouvidoria
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Canal de <span className="text-party-blue">Comunicação</span>
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Sua voz é importante! Envie sugestões, denúncias ou reclamações.
+            Todas as mensagens são tratadas com sigilo e seriedade.
+          </p>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Type Selection Cards */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground mb-4">Tipo de Mensagem</h3>
+            {complaintTypes.map((type) => (
+              <Card
+                key={type.value}
+                className={`cursor-pointer transition-all ${
+                  formData.type === type.value
+                    ? "border-slate-800 border-2 shadow-md"
+                    : "border hover:border-slate-300"
+                }`}
+                onClick={() => setFormData({ ...formData, type: type.value })}
+              >
+                <CardContent className="p-4 flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+                    <type.icon className="h-5 w-5 text-slate-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-foreground">{type.label}</h4>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Privacy Info */}
+            <Card className="bg-slate-50 border-slate-200 mt-6">
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-slate-600 mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-foreground text-sm">Sigilo Garantido</h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Todas as mensagens são tratadas com total confidencialidade.
+                      Você pode enviar denúncias de forma anônima.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Form */}
+          <div className="lg:col-span-2">
+            <Card className="border-0 shadow-lg">
+              <CardHeader className="bg-slate-800 text-white rounded-t-lg">
+                <h3 className="text-xl font-semibold">Envie sua Mensagem</h3>
+              </CardHeader>
+              <CardContent className="p-6">
+                {isSuccess ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="h-8 w-8 text-slate-600" />
+                    </div>
+                    <h4 className="text-xl font-semibold text-foreground mb-2">
+                      Mensagem Enviada!
+                    </h4>
+                    <p className="text-muted-foreground mb-6">
+                      Obrigado pelo seu contato. Nossa equipe analisará sua mensagem.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        setIsSuccess(false);
+                        setFormData({
+                          type: "",
+                          name: "",
+                          email: "",
+                          phone: "",
+                          province: "",
+                          subject: "",
+                          message: "",
+                          anonymous: false,
+                        });
+                        setIsAnonymous(false);
+                      }}
+                      variant="outline"
+                    >
+                      Nova Mensagem
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Anonymous Toggle */}
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div className="flex items-center gap-3">
+                        {isAnonymous ? (
+                          <EyeOff className="h-5 w-5 text-slate-500" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-slate-600" />
+                        )}
+                        <div>
+                          <span className="font-medium text-foreground">Envio Anônimo</span>
+                          <p className="text-xs text-muted-foreground">
+                            {isAnonymous
+                              ? "Seus dados não serão registrados"
+                              : "Seus dados serão registrados"}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant={isAnonymous ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          setIsAnonymous(!isAnonymous);
+                          setFormData({
+                            ...formData,
+                            anonymous: !isAnonymous,
+                            name: !isAnonymous ? "" : formData.name,
+                            email: !isAnonymous ? "" : formData.email,
+                            phone: !isAnonymous ? "" : formData.phone,
+                          });
+                        }}
+                        className={isAnonymous ? "bg-slate-700 hover:bg-slate-800" : ""}
+                      >
+                        {isAnonymous ? "Anônimo" : "Identificado"}
+                      </Button>
+                    </div>
+
+                    {/* Personal Info - Only if not anonymous */}
+                    {!isAnonymous && (
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="name">Nome *</Label>
+                          <Input
+                            id="name"
+                            placeholder="Seu nome"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required={!isAnonymous}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Telefone</Label>
+                          <Input
+                            id="phone"
+                            placeholder="+244 9XX XXX XXX"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {!isAnonymous && (
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="seu@email.com"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          required={!isAnonymous}
+                        />
+                      </div>
+                    )}
+
+                    {/* Province */}
+                    <div className="space-y-2">
+                      <Label>Província (opcional)</Label>
+                      <Select
+                        value={formData.province}
+                        onValueChange={(value) => setFormData({ ...formData, province: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione a província relacionada" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {provinces.map((p) => (
+                            <SelectItem key={p} value={p}>
+                              {p}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Subject */}
+                    <div className="space-y-2">
+                      <Label htmlFor="subject">Assunto *</Label>
+                      <Input
+                        id="subject"
+                        placeholder="Resumo do assunto"
+                        value={formData.subject}
+                        onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                        required
+                      />
+                    </div>
+
+                    {/* Message */}
+                    <div className="space-y-2">
+                      <Label htmlFor="message">Mensagem *</Label>
+                      <Textarea
+                        id="message"
+                        placeholder="Descreva sua mensagem em detalhes..."
+                        value={formData.message}
+                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        rows={6}
+                        required
+                      />
+                    </div>
+
+                    {/* Type validation */}
+                    {!formData.type && (
+                      <p className="text-sm text-slate-600">
+                        Selecione o tipo de mensagem ao lado
+                      </p>
+                    )}
+
+                    {/* Submit */}
+                    <Button
+                      type="submit"
+                      className="w-full btn-cta py-6"
+                      disabled={isSubmitting || !formData.type}
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Enviar Mensagem
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
