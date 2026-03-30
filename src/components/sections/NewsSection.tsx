@@ -197,21 +197,20 @@ export function NewsSection() {
             </div>
           ) : (
             <>
-              {/* 3 Featured News Cards */}
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                {displayFeatured.map((item, index) => (
+              {/* Featured News - Flex Layout para evitar espaços vazios */}
+              <div className="flex flex-col lg:flex-row gap-6 mb-8">
+                {/* Main Featured News (Large) */}
+                {displayFeatured[0] && (
                   <Card
-                    key={item.id}
-                    className={`rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0 ${
-                      index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''
-                    }`}
-                    onClick={() => handleNewsClick(item)}
+                    key={displayFeatured[0].id}
+                    className="lg:w-2/3 rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0"
+                    onClick={() => handleNewsClick(displayFeatured[0])}
                   >
-                    <div className={`${index === 0 ? 'h-72' : 'h-48'} relative overflow-hidden`}>
-                      {item.image ? (
+                    <div className="h-64 lg:h-80 relative overflow-hidden">
+                      {displayFeatured[0].image ? (
                         <img
-                          src={item.image}
-                          alt={item.title}
+                          src={displayFeatured[0].image}
+                          alt={displayFeatured[0].title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       ) : (
@@ -219,48 +218,80 @@ export function NewsSection() {
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                       <span className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
-                        {categoryLabels[item.category] || item.category}
+                        {categoryLabels[displayFeatured[0].category] || displayFeatured[0].category}
                       </span>
                     </div>
-                    <CardContent className={`${index === 0 ? 'p-6' : 'p-4'}`}>
-                      <h3 className={`${index === 0 ? 'text-2xl' : 'text-lg'} font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2 line-clamp-2`}>
-                        {item.title}
+                    <CardContent className="p-6">
+                      <h3 className="text-2xl font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2">
+                        {displayFeatured[0].title}
                       </h3>
-                      <p className={`text-muted-foreground ${index === 0 ? 'mb-4' : 'mb-3 text-sm line-clamp-2'}`}>
-                        {item.summary}
+                      <p className="text-muted-foreground mb-4">
+                        {displayFeatured[0].summary}
                       </p>
-                      <div className={`flex items-center ${index === 0 ? 'justify-between' : 'gap-3'} text-sm text-muted-foreground`}>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <Calendar className="w-4 h-4 text-slate-500" />
-                          <span className={index === 0 ? '' : 'text-xs'}>{formatDate(item.createdAt)}</span>
+                          <span>{formatDate(displayFeatured[0].createdAt)}</span>
                         </div>
-                        {index === 0 ? (
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1">
-                              <User className="w-4 h-4 text-slate-500" />
-                              <span className="text-slate-600 font-medium">{item.author}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Eye className="w-4 h-4 text-slate-500" />
-                              <span>{item.views || 0}</span>
-                            </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-1">
+                            <User className="w-4 h-4 text-slate-500" />
+                            <span className="text-slate-600 font-medium">{displayFeatured[0].author}</span>
                           </div>
-                        ) : (
-                          <>
-                            <div className="flex items-center gap-1">
-                              <User className="w-3 h-3 text-slate-500" />
-                              <span className="text-xs">{item.author}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Eye className="w-3 h-3 text-slate-500" />
-                              <span className="text-xs">{item.views || 0}</span>
-                            </div>
-                          </>
-                        )}
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-4 h-4 text-slate-500" />
+                            <span>{displayFeatured[0].views || 0}</span>
+                          </div>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                ))}
+                )}
+
+                {/* Secondary Featured News (Stacked) */}
+                <div className="lg:w-1/3 flex flex-col gap-6">
+                  {displayFeatured.slice(1, 3).map((item) => (
+                    <Card
+                      key={item.id}
+                      className="flex-1 rounded-xl shadow-md overflow-hidden group cursor-pointer hover:shadow-xl transition-all duration-300 border-0"
+                      onClick={() => handleNewsClick(item)}
+                    >
+                      <div className="h-40 relative overflow-hidden">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-blue-gradient" />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        <span className="absolute top-3 left-3 px-2 py-0.5 rounded text-xs font-medium bg-white/90 text-blue-700">
+                          {categoryLabels[item.category] || item.category}
+                        </span>
+                      </div>
+                      <CardContent className="p-4">
+                        <h3 className="text-lg font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2 line-clamp-2">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                          {item.summary}
+                        </p>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 text-slate-500" />
+                            <span>{formatDate(item.createdAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-3 h-3 text-slate-500" />
+                            <span>{item.views || 0}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
 
               {/* Regular News - Horizontal List */}
