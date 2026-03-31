@@ -32,6 +32,7 @@ import {
   UsersIcon,
   CalendarDaysIcon,
   DocumentTextIcon,
+  Cog6ToothIcon,
   CubeIcon,
   ChatBubbleLeftEllipsisIcon,
   BellAlertIcon,
@@ -63,7 +64,7 @@ interface Stats {
   activeAlerts: number
 }
 
-type Section = 'dashboard' | 'news' | 'leaders' | 'events' | 'program' | 'kit' | 'volunteers' | 'complaints' | 'subscribers' | 'alerts'
+type Section = 'dashboard' | 'settings' | 'news' | 'leaders' | 'events' | 'program' | 'kit' | 'volunteers' | 'complaints' | 'subscribers' | 'alerts'
 
 const ANGOLAN_PROVINCES = [
   'Bengo', 'Benguela', 'Bié', 'Cabinda', 'Cunene', 'Cuanza Norte', 'Cuanza Sul',
@@ -133,6 +134,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
     try {
       const endpoints: Record<Section, string> = {
         dashboard: '/api/admin/stats',
+        settings: '/api/admin/site-config',
         news: '/api/admin/news',
         leaders: '/api/admin/leaders',
         events: '/api/admin/events',
@@ -280,6 +282,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
     try {
       const endpoints: Record<Section, string> = {
         dashboard: '',
+        settings: '',
         news: `/api/admin/news?id=${deleteId}`,
         leaders: `/api/admin/leaders?id=${deleteId}`,
         events: `/api/admin/events?id=${deleteId}`,
@@ -318,6 +321,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
 
   const menuItems = [
     { id: 'dashboard', label: 'Painel Principal', icon: HomeIcon },
+    { id: 'settings', label: 'Configurações do Site', icon: Cog6ToothIcon },
     { id: 'news', label: 'Notícias', icon: NewspaperIcon, count: stats?.news },
     { id: 'leaders', label: 'Liderança', icon: UsersIcon, count: stats?.leaders },
     { id: 'events', label: 'Agenda', icon: CalendarDaysIcon, count: stats?.events },
@@ -440,6 +444,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
   const getSectionTitle = (s: Section): string => {
     const titles: Record<Section, string> = {
       dashboard: 'Painel Principal',
+      settings: 'Configurações do Site',
       news: 'Gestão de Notícias',
       leaders: 'Liderança do Partido',
       events: 'Agenda de Atividades',
@@ -456,6 +461,7 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
   const getSectionDescription = (s: Section): string => {
     const descriptions: Record<Section, string> = {
       dashboard: 'Visão geral do sistema',
+      settings: 'Configure a imagem do hero, vídeo institucional e textos principais',
       news: 'Publique e gerencie notícias e comunicados oficiais',
       leaders: 'Cadastre dirigentes e candidatos do partido',
       events: 'Agende eventos e atividades partidárias',
@@ -545,6 +551,8 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
         <main className="flex-1 overflow-auto p-8 bg-slate-50">
           {section === 'dashboard' ? (
             <DashboardContent stats={stats} />
+          ) : section === 'settings' ? (
+            <SettingsSection />
           ) : (
             <>
               <div className="flex items-center justify-between mb-8">
@@ -746,6 +754,154 @@ export function AdminPanel({ onClose }: { onClose: () => void }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  )
+}
+
+// Settings Section
+function SettingsSection() {
+  const [config, setConfig] = useState<Record<string, any>>({})
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    fetchConfig()
+  }, [])
+
+  const fetchConfig = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/admin/site-config')
+      const result = await res.json()
+      if (result.config) {
+        setConfig(result.config)
+      }
+    } catch {
+      toast.error('Erro ao carregar configurações')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const updateConfig = (key: string, value: string) => {
+    setConfig(prev => ({ ...prev, [key]: value }))
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch('/api/admin/site-config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(config),
+      })
+      const result = await res.json()
+      if (result.success) {
+        toast.success('Configurações salvas com sucesso!')
+      } else {
+        toast.error(result.error || 'Erro ao salvar')
+      }
+    } catch {
+      toast.error('Erro ao salvar configurações')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <ArrowPathIcon className="w-10 h-10 text-slate-400 animate-spin" />
+        <p className="text-slate-500 mt-4">Carregando configurações...</p>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Configurações do Site</h2>
+          <p className="text-slate-500 mt-1">Configure a imagem do hero, vídeo institucional e textos principais</p>
+        </div>
+        <Button onClick={handleSave} disabled={saving} className="bg-slate-800 hover:bg-slate-900 min-w-[180px]">
+          {saving ? (
+            <><ArrowPathIcon className="w-4 h-4 mr-2 animate-spin" />Salvando...</>
+          ) : (
+            <><CheckCircleIcon className="w-4 h-4 mr-2" />Salvar Configurações</>
+          )}
+        </Button>
+      </div>
+
+      <div className="space-y-8">
+        {/* Hero Section */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <HomeIcon className="w-5 h-5 text-blue-600" />
+            Seção Hero (Topo do Site)
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-slate-700">URL da Imagem de Fundo</Label>
+              <Input value={config.heroImage || ''} onChange={(e) => updateConfig('heroImage', e.target.value)} placeholder="https://exemplo.com/hero.jpg" className="mt-1.5" />
+              {config.heroImage && (
+                <div className="mt-2 relative w-full h-40 rounded-lg overflow-hidden border border-slate-200">
+                  <img src={config.heroImage} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-sm font-medium text-slate-700">Badge</Label>
+                <Input value={config.heroBadge || ''} onChange={(e) => updateConfig('heroBadge', e.target.value)} className="mt-1.5" />
+              </div>
+              <div>
+                <Label className="text-sm font-medium text-slate-700">Título Principal</Label>
+                <Input value={config.heroTitle || ''} onChange={(e) => updateConfig('heroTitle', e.target.value)} className="mt-1.5" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-slate-700">Subtítulo</Label>
+              <Textarea value={config.heroSubtitle || ''} onChange={(e) => updateConfig('heroSubtitle', e.target.value)} rows={3} className="mt-1.5" />
+            </div>
+          </div>
+        </div>
+
+        {/* Video */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <DocumentTextIcon className="w-5 h-5 text-violet-600" />
+            Vídeo Institucional
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-sm font-medium text-slate-700">URL do Vídeo (YouTube ou Vimeo)</Label>
+              <Input value={config.videoUrl || ''} onChange={(e) => updateConfig('videoUrl', e.target.value)} placeholder="https://www.youtube.com/watch?v=..." className="mt-1.5" />
+              {config.videoUrl && (
+                <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
+                  <CheckCircleIcon className="w-3 h-3" /> URL do vídeo configurada
+                </p>
+              )}
+            </div>
+            <div>
+              <Label className="text-sm font-medium text-slate-700">Título do Vídeo</Label>
+              <Input value={config.videoTitle || ''} onChange={(e) => updateConfig('videoTitle', e.target.value)} placeholder="Vídeo Institucional" className="mt-1.5" />
+            </div>
+          </div>
+        </div>
+
+        {/* Party Section */}
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <UsersIcon className="w-5 h-5 text-emerald-600" />
+            Seção O Partido
+          </h3>
+          <div>
+            <Label className="text-sm font-medium text-slate-700">Descrição do Partido</Label>
+            <Textarea value={config.partyDescription || ''} onChange={(e) => updateConfig('partyDescription', e.target.value)} rows={3} className="mt-1.5" />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
