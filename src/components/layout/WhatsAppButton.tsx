@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChatBubbleOvalLeftEllipsisIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/lib/i18n";
 
 export function WhatsAppButton() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const phoneNumber = "244923456789";
-  const message = "Olá! Gostaria de saber mais sobre o Partido Liberal.";
+  const message = t.whatsapp.prefill;
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (
@@ -28,7 +30,7 @@ export function WhatsAppButton() {
           </div>
           <div className="p-4 bg-slate-50">
             <p className="text-sm text-slate-600">
-              Olá! Como podemos ajudá-lo? Clique abaixo para iniciar uma conversa.
+              {t.whatsapp.greeting}
             </p>
           </div>
           <div className="p-3 border-t border-slate-100">
@@ -40,7 +42,7 @@ export function WhatsAppButton() {
             >
               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                 <ChatBubbleOvalLeftEllipsisIcon className="w-5 h-5 mr-2" />
-                Iniciar Conversa
+                {t.whatsapp.startConversation}
               </Button>
             </a>
           </div>

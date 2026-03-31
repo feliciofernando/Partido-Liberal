@@ -27,13 +27,16 @@ import {
   EyeOff,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/lib/i18n";
 
-const complaintTypes = [
-  { value: "sugestao", label: "Sugestão", icon: Lightbulb },
-  { value: "denuncia", label: "Denúncia", icon: AlertTriangle },
-  { value: "reclamacao", label: "Reclamação", icon: MessageSquare },
-  { value: "informacao", label: "Pedido de Informação", icon: HelpCircle },
+const complaintTypeValues = [
+  { value: "sugestao", icon: Lightbulb },
+  { value: "denuncia", icon: AlertTriangle },
+  { value: "reclamacao", icon: MessageSquare },
+  { value: "informacao", icon: HelpCircle },
 ];
+
+const complaintTypeLabels = ["suggestion", "complaint", "grievance", "infoRequest"] as const;
 
 const provinces = [
   "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango",
@@ -43,6 +46,7 @@ const provinces = [
 ];
 
 export function ComplaintsSection() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isAnonymous, setIsAnonymous] = useState(false);
@@ -102,22 +106,21 @@ export function ComplaintsSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge className="bg-blue-100 text-blue-700 mb-4">
-            Ouvidoria
+            {t.complaints.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Canal de <span className="text-party-blue">Comunicação</span>
+            {t.complaints.heading}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Sua voz é importante! Envie sugestões, denúncias ou reclamações.
-            Todas as mensagens são tratadas com sigilo e seriedade.
+            {t.complaints.description}
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Type Selection Cards */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground mb-4">Tipo de Mensagem</h3>
-            {complaintTypes.map((type) => (
+            <h3 className="font-semibold text-foreground mb-4">{t.complaints.messageType}</h3>
+            {complaintTypeValues.map((type, index) => (
               <Card
                 key={type.value}
                 className={`cursor-pointer transition-all ${
@@ -132,7 +135,7 @@ export function ComplaintsSection() {
                     <type.icon className="h-5 w-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-foreground">{type.label}</h4>
+                    <h4 className="font-medium text-foreground">{t.complaints.types[complaintTypeLabels[index]]}</h4>
                   </div>
                 </CardContent>
               </Card>
@@ -144,10 +147,9 @@ export function ComplaintsSection() {
                 <div className="flex items-start gap-3">
                   <Shield className="h-5 w-5 text-blue-600 mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-foreground text-sm">Sigilo Garantido</h4>
+                    <h4 className="font-medium text-foreground text-sm">{t.complaints.privacy.heading}</h4>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Todas as mensagens são tratadas com total confidencialidade.
-                      Você pode enviar denúncias de forma anônima.
+                      {t.complaints.privacy.description}
                     </p>
                   </div>
                 </div>
@@ -159,7 +161,7 @@ export function ComplaintsSection() {
           <div className="lg:col-span-2">
             <Card className="border-0 shadow-lg">
               <CardHeader className="bg-blue-gradient text-white rounded-t-lg">
-                <h3 className="text-xl font-semibold">Envie sua Mensagem</h3>
+                <h3 className="text-xl font-semibold">{t.complaints.form.title}</h3>
               </CardHeader>
               <CardContent className="p-6">
                 {isSuccess ? (
@@ -168,10 +170,10 @@ export function ComplaintsSection() {
                       <CheckCircle className="h-8 w-8 text-blue-600" />
                     </div>
                     <h4 className="text-xl font-semibold text-foreground mb-2">
-                      Mensagem Enviada!
+                      {t.complaints.form.successTitle}
                     </h4>
                     <p className="text-muted-foreground mb-6">
-                      Obrigado pelo seu contato. Nossa equipe analisará sua mensagem.
+                      {t.complaints.form.successDescription}
                     </p>
                     <Button
                       onClick={() => {
@@ -190,7 +192,7 @@ export function ComplaintsSection() {
                       }}
                       variant="outline"
                     >
-                      Nova Mensagem
+                      {t.complaints.form.newMessage}
                     </Button>
                   </div>
                 ) : (
@@ -204,11 +206,11 @@ export function ComplaintsSection() {
                           <Eye className="h-5 w-5 text-slate-600" />
                         )}
                         <div>
-                          <span className="font-medium text-foreground">Envio Anônimo</span>
+                          <span className="font-medium text-foreground">{t.complaints.form.anonymous}</span>
                           <p className="text-xs text-muted-foreground">
                             {isAnonymous
-                              ? "Seus dados não serão registrados"
-                              : "Seus dados serão registrados"}
+                              ? t.complaints.form.anonymousDesc
+                              : t.complaints.form.identifiedDesc}
                           </p>
                         </div>
                       </div>
@@ -228,7 +230,7 @@ export function ComplaintsSection() {
                         }}
                         className={isAnonymous ? "bg-blue-600 hover:bg-blue-700" : ""}
                       >
-                        {isAnonymous ? "Anônimo" : "Identificado"}
+                        {isAnonymous ? t.complaints.form.anonymousLabel : t.complaints.form.identifiedLabel}
                       </Button>
                     </div>
 
@@ -236,17 +238,17 @@ export function ComplaintsSection() {
                     {!isAnonymous && (
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Nome *</Label>
+                          <Label htmlFor="name">{t.complaints.form.name}</Label>
                           <Input
                             id="name"
-                            placeholder="Seu nome"
+                            placeholder={t.complaints.form.namePlaceholder}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required={!isAnonymous}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Telefone</Label>
+                          <Label htmlFor="phone">{t.complaints.form.phone}</Label>
                           <Input
                             id="phone"
                             placeholder="+244 9XX XXX XXX"
@@ -259,7 +261,7 @@ export function ComplaintsSection() {
 
                     {!isAnonymous && (
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
+                        <Label htmlFor="email">{t.complaints.form.email}</Label>
                         <Input
                           id="email"
                           type="email"
@@ -273,13 +275,13 @@ export function ComplaintsSection() {
 
                     {/* Province */}
                     <div className="space-y-2">
-                      <Label>Província (opcional)</Label>
+                      <Label>{t.complaints.form.province}</Label>
                       <Select
                         value={formData.province}
                         onValueChange={(value) => setFormData({ ...formData, province: value })}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione a província relacionada" />
+                          <SelectValue placeholder={t.complaints.form.provincePlaceholder} />
                         </SelectTrigger>
                         <SelectContent>
                           {provinces.map((p) => (
@@ -293,10 +295,10 @@ export function ComplaintsSection() {
 
                     {/* Subject */}
                     <div className="space-y-2">
-                      <Label htmlFor="subject">Assunto *</Label>
+                      <Label htmlFor="subject">{t.complaints.form.subject}</Label>
                       <Input
                         id="subject"
-                        placeholder="Resumo do assunto"
+                        placeholder={t.complaints.form.subjectPlaceholder}
                         value={formData.subject}
                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                         required
@@ -305,10 +307,10 @@ export function ComplaintsSection() {
 
                     {/* Message */}
                     <div className="space-y-2">
-                      <Label htmlFor="message">Mensagem *</Label>
+                      <Label htmlFor="message">{t.complaints.form.message}</Label>
                       <Textarea
                         id="message"
-                        placeholder="Descreva sua mensagem em detalhes..."
+                        placeholder={t.complaints.form.messagePlaceholder}
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         rows={6}
@@ -319,7 +321,7 @@ export function ComplaintsSection() {
                     {/* Type validation */}
                     {!formData.type && (
                       <p className="text-sm text-slate-600">
-                        Selecione o tipo de mensagem ao lado
+                        {t.complaints.form.selectType}
                       </p>
                     )}
 
@@ -332,12 +334,12 @@ export function ComplaintsSection() {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Enviando...
+                          {t.complaints.form.submitting}
                         </>
                       ) : (
                         <>
                           <Send className="mr-2 h-4 w-4" />
-                          Enviar Mensagem
+                          {t.complaints.form.submit}
                         </>
                       )}
                     </Button>

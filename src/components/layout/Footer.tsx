@@ -7,27 +7,7 @@ import {
   PhoneIcon,
   EnvelopeIcon,
 } from "@heroicons/react/24/outline";
-
-const footerLinks = {
-  partido: [
-    { name: "Sobre Nós", href: "#partido" },
-    { name: "Liderança", href: "#lideranca" },
-    { name: "Estatuto", href: "#" },
-    { name: "Transparência", href: "#" },
-  ],
-  participate: [
-    { name: "Seja Voluntário", href: "#voluntarios" },
-    { name: "Agenda", href: "#eventos" },
-    { name: "Notícias", href: "#noticias" },
-    { name: "Ouvidoria", href: "#ouvidoria" },
-  ],
-  resources: [
-    { name: "Programa de Governo", href: "#programa" },
-    { name: "Kit Digital", href: "#kit" },
-    { name: "Newsletter", href: "#newsletter" },
-    { name: "Contacto", href: "#contato" },
-  ],
-};
+import { useTranslation } from "@/lib/i18n";
 
 const socialLinks = [
   { name: "Facebook", href: "#", icon: "facebook" },
@@ -36,7 +16,31 @@ const socialLinks = [
   { name: "YouTube", href: "#", icon: "youtube" },
 ];
 
+// Footer link column definitions mapping translation keys to hrefs
+const footerLinkColumns = {
+  partido: [
+    { key: "aboutUs" as const, href: "#partido" },
+    { key: "leadership" as const, href: "#lideranca" },
+    { key: "statute" as const, href: "#" },
+    { key: "transparency" as const, href: "#" },
+  ],
+  participate: [
+    { key: "beVolunteer" as const, href: "#voluntarios" },
+    { key: "agenda" as const, href: "#eventos" },
+    { key: "news" as const, href: "#noticias" },
+    { key: "ombudsman" as const, href: "#ouvidoria" },
+  ],
+  resources: [
+    { key: "govProgram" as const, href: "#programa" },
+    { key: "digitalKit" as const, href: "#kit" },
+    { key: "newsletter" as const, href: "#newsletter" },
+    { key: "contact" as const, href: "#contato" },
+  ],
+};
+
 export function Footer() {
+  const { t } = useTranslation();
+
   return (
     <footer className="footer-gradient text-white mt-auto">
       {/* Main Footer */}
@@ -50,19 +54,18 @@ export function Footer() {
               </div>
               <div className="flex flex-col">
                 <span className="text-xl font-bold leading-tight">PARTIDO LIBERAL</span>
-                <span className="text-sm text-blue-200 leading-tight">Construindo o Futuro de Angola</span>
+                <span className="text-sm text-blue-200 leading-tight">{t.footer.tagline}</span>
               </div>
             </Link>
             <p className="text-blue-100/80 text-sm leading-relaxed mb-6 max-w-md">
-              O Partido Liberal é a voz da mudança, da liberdade e do progresso. 
-              Trabalhamos por um Angola próspero, justo e democrático para todos os cidadãos.
+              {t.footer.description}
             </p>
             
             {/* Contact Info */}
             <div className="space-y-3">
               <div className="flex items-center gap-3 text-sm text-blue-100/80">
                 <MapPinIcon className="w-5 h-5 text-amber-400" />
-                <span>Luanda, Angola</span>
+                <span>{t.footer.location}</span>
               </div>
               <div className="flex items-center gap-3 text-sm text-blue-100/80">
                 <PhoneIcon className="w-5 h-5 text-amber-400" />
@@ -77,12 +80,12 @@ export function Footer() {
 
           {/* Links */}
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">O Partido</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">{t.footer.columns.party}</h3>
             <ul className="space-y-3">
-              {footerLinks.partido.map((link) => (
-                <li key={link.name}>
+              {footerLinkColumns.partido.map((link) => (
+                <li key={link.key}>
                   <Link href={link.href} className="text-sm text-blue-100/70 hover:text-amber-400 transition-colors">
-                    {link.name}
+                    {t.footer.links[link.key]}
                   </Link>
                 </li>
               ))}
@@ -90,12 +93,12 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">Participe</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">{t.footer.columns.participate}</h3>
             <ul className="space-y-3">
-              {footerLinks.participate.map((link) => (
-                <li key={link.name}>
+              {footerLinkColumns.participate.map((link) => (
+                <li key={link.key}>
                   <Link href={link.href} className="text-sm text-blue-100/70 hover:text-amber-400 transition-colors">
-                    {link.name}
+                    {t.footer.links[link.key]}
                   </Link>
                 </li>
               ))}
@@ -103,12 +106,12 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">Recursos</h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wider mb-4 text-blue-100">{t.footer.columns.resources}</h3>
             <ul className="space-y-3">
-              {footerLinks.resources.map((link) => (
-                <li key={link.name}>
+              {footerLinkColumns.resources.map((link) => (
+                <li key={link.key}>
                   <Link href={link.href} className="text-sm text-blue-100/70 hover:text-amber-400 transition-colors">
-                    {link.name}
+                    {t.footer.links[link.key]}
                   </Link>
                 </li>
               ))}
@@ -122,14 +125,14 @@ export function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-blue-100/60">
-              © {new Date().getFullYear()} Partido Liberal. Todos os direitos reservados.
+              © {new Date().getFullYear()} {t.footer.copyright}
             </p>
             <div className="flex items-center gap-4">
               <Link href="#" className="text-sm text-blue-100/60 hover:text-amber-400 transition-colors">
-                Política de Privacidade
+                {t.footer.privacyPolicy}
               </Link>
               <Link href="#" className="text-sm text-blue-100/60 hover:text-amber-400 transition-colors">
-                Termos de Uso
+                {t.footer.termsOfUse}
               </Link>
             </div>
           </div>

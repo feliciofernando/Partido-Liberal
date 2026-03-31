@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Bell, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/lib/i18n";
 
 interface Alert {
   id: string;
@@ -12,17 +13,19 @@ interface Alert {
   type: string;
 }
 
-// Dados padrão caso não haja alerta no banco
-const defaultAlert: Alert = {
-  id: "1",
-  title: "Grande Comício em Luanda",
-  message: "Não perca o lançamento da campanha em Luanda no dia 20 de Fevereiro!",
-  type: "urgente",
-};
-
 export function AlertBanner() {
   const [isVisible, setIsVisible] = useState(true);
-  const [alert, setAlert] = useState<Alert>(defaultAlert);
+  const [alert, setAlert] = useState<Alert | null>(null);
+  const { t } = useTranslation();
+
+  const defaultAlert: Alert = {
+    id: "1",
+    title: t.alert.defaultTitle,
+    message: t.alert.defaultMessage,
+    type: "urgente",
+  };
+
+  const activeAlert = alert ?? defaultAlert;
 
   useEffect(() => {
     const fetchAlert = async () => {
@@ -62,13 +65,13 @@ export function AlertBanner() {
                   </motion.div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate">{alert.title}</p>
+                  <p className="font-semibold text-sm truncate">{activeAlert.title}</p>
                   <p className="text-xs text-white/80 truncate hidden sm:block">
-                    {alert.message?.replace(/<[^>]*>/g, '').substring(0, 100)}
+                    {activeAlert.message?.replace(/<[^>]*>/g, '').substring(0, 100)}
                   </p>
                 </div>
                 <span className="hidden md:inline-flex items-center gap-1 px-3 py-1.5 bg-party-yellow text-party-blue-dark hover:bg-party-yellow-dark text-xs font-medium rounded-md transition-colors">
-                  Saiba Mais
+                  {t.alert.learnMore}
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </span>
               </div>
@@ -82,7 +85,7 @@ export function AlertBanner() {
             setIsVisible(false);
           }}
           className="absolute right-2 top-1/2 -translate-y-1/2 flex-shrink-0 p-1 hover:bg-white/10 rounded transition-colors z-10"
-          aria-label="Fechar alerta"
+          aria-label={t.alert.close}
         >
           <X className="h-4 w-4" />
         </button>

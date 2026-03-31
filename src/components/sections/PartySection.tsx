@@ -4,35 +4,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Target, Heart, Shield, Globe, Play, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
-const defaultValues = [
-  {
-    icon: Target,
-    title: "Liberdade",
-    description: "Defendemos a liberdade individual como direito fundamental de cada cidadão.",
-  },
-  {
-    icon: Heart,
-    title: "Justiça Social",
-    description: "Promovemos a igualdade de oportunidades e o bem-estar para todos os angolanos.",
-  },
-  {
-    icon: Shield,
-    title: "Democracia",
-    description: "Acreditamos no poder do povo e na participação cívica ativa.",
-  },
-  {
-    icon: Globe,
-    title: "Desenvolvimento",
-    description: "Buscamos o crescimento sustentável e o progresso de Angola.",
-  },
+const valueIcons = [
+  { icon: Target, key: "freedom" as const },
+  { icon: Heart, key: "justice" as const },
+  { icon: Shield, key: "democracy" as const },
+  { icon: Globe, key: "development" as const },
 ];
 
-const defaultTimeline = [
-  { year: "2010", title: "Fundação", desc: "O Partido Liberal foi fundado por um grupo de cidadãos comprometidos com a mudança." },
-  { year: "2015", title: "Expansão Nacional", desc: "Chegamos a todas as 18 províncias de Angola." },
-  { year: "2020", title: "Crescimento Expressivo", desc: "Triplicamos o número de membros e apoiantes." },
-  { year: "2025", title: "Presente", desc: "Preparados para as eleições com propostas inovadoras." },
+const defaultTimelineKeys = [
+  { year: "2010", key: "foundation" as const },
+  { year: "2015", key: "expansion" as const },
+  { year: "2020", key: "growth" as const },
+  { year: "2025", key: "present" as const },
 ];
 
 interface SiteConfig {
@@ -41,20 +26,17 @@ interface SiteConfig {
   partyDescription?: string;
   partyTitle?: string;
   partySubtitle?: string;
-  timeline?: typeof defaultTimeline;
 }
 
-const defaultConfig: SiteConfig = {
-  videoUrl: '',
-  videoTitle: 'Vídeo Institucional',
-  partyDescription: 'Fundado com a missão de transformar Angola em uma nação próspera e justa, o Partido Liberal representa a voz da mudança e do progresso.',
-  partyTitle: 'Conheça o Partido Liberal',
-  partySubtitle: 'O Partido',
-  timeline: defaultTimeline,
-};
-
 export function PartySection() {
-  const [config, setConfig] = useState<SiteConfig>(defaultConfig);
+  const { t } = useTranslation();
+  const [config, setConfig] = useState<SiteConfig>({
+    videoUrl: '',
+    videoTitle: t.party.videoTitle,
+    partyDescription: t.party.description,
+    partyTitle: t.party.title,
+    partySubtitle: t.party.subtitle,
+  });
   const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
@@ -63,16 +45,22 @@ export function PartySection() {
         const res = await fetch('/api/site-config');
         const data = await res.json();
         if (data.config) {
-          setConfig({ ...defaultConfig, ...data.config });
+          setConfig({
+            videoUrl: '',
+            videoTitle: t.party.videoTitle,
+            partyDescription: t.party.description,
+            partyTitle: t.party.title,
+            partySubtitle: t.party.subtitle,
+            ...data.config,
+          });
         }
       } catch (error) {
         console.log('Using default party config');
       }
     }
     loadConfig();
-  }, []);
+  }, [t]);
 
-  // Extract YouTube video ID from URL
   const getYouTubeId = (url: string) => {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -80,7 +68,6 @@ export function PartySection() {
     return match && match[2].length === 11 ? match[2] : null;
   };
 
-  // Extract Vimeo video ID from URL
   const getVimeoId = (url: string) => {
     if (!url) return null;
     const regExp = /vimeo\.com\/(\d+)/;
@@ -115,8 +102,6 @@ export function PartySection() {
     return null;
   };
 
-  const timeline = config.timeline || defaultTimeline;
-
   return (
     <>
       <section id="partido" className="py-20 bg-gray-50">
@@ -124,10 +109,10 @@ export function PartySection() {
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Badge className="bg-slate-100 text-slate-700 mb-4">
-              {config.partySubtitle || 'O Partido'}
+              {config.partySubtitle || t.party.subtitle}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {config.partyTitle || 'Conheça o Partido Liberal'}
+              {config.partyTitle || t.party.title}
             </h2>
             <p className="text-lg text-muted-foreground">
               {config.partyDescription}
@@ -147,7 +132,7 @@ export function PartySection() {
                     {youtubeId && (
                       <img
                         src={`https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`}
-                        alt={config.videoTitle || 'Vídeo'}
+                        alt={config.videoTitle || t.party.videoTitle}
                         className="w-full h-full object-cover"
                       />
                     )}
@@ -165,7 +150,7 @@ export function PartySection() {
                     <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
                       <Play className="w-10 h-10 ml-1" />
                     </div>
-                    <p className="text-white/80">{config.videoTitle || 'Vídeo Institucional'}</p>
+                    <p className="text-white/80">{config.videoTitle || t.party.videoTitle}</p>
                   </div>
                 )}
               </div>
@@ -176,20 +161,20 @@ export function PartySection() {
             {/* Right - Values */}
             <div className="space-y-6">
               <h3 className="text-2xl font-semibold text-foreground mb-6">
-                Nossos Valores Fundamentais
+                {t.party.valuesHeading}
               </h3>
               <div className="grid sm:grid-cols-2 gap-4">
-                {defaultValues.map((value) => (
-                  <Card key={value.title} className="card-hover border-0 shadow-sm">
+                {valueIcons.map(({ icon: Icon, key }) => (
+                  <Card key={key} className="card-hover border-0 shadow-sm">
                     <CardContent className="p-6">
                       <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
-                        <value.icon className="h-6 w-6 text-slate-600" />
+                        <Icon className="h-6 w-6 text-slate-600" />
                       </div>
                       <h4 className="font-semibold text-foreground mb-2">
-                        {value.title}
+                        {t.party.values[key].title}
                       </h4>
                       <p className="text-sm text-muted-foreground">
-                        {value.description}
+                        {t.party.values[key].description}
                       </p>
                     </CardContent>
                   </Card>
@@ -201,7 +186,7 @@ export function PartySection() {
           {/* History Timeline */}
           <div className="mt-20">
             <h3 className="text-2xl font-semibold text-center text-foreground mb-12">
-              Nossa Trajetória
+              {t.party.timeline.heading}
             </h3>
             <div className="relative max-w-4xl mx-auto">
               {/* Timeline Line */}
@@ -209,7 +194,7 @@ export function PartySection() {
 
               {/* Timeline Items */}
               <div className="space-y-8">
-                {timeline.map((item, index) => (
+                {defaultTimelineKeys.map((item, index) => (
                   <div
                     key={item.year}
                     className={`relative flex items-center ${
@@ -221,8 +206,8 @@ export function PartySection() {
                         <Badge className="bg-blue-600 text-white mb-2">
                           {item.year}
                         </Badge>
-                        <h4 className="font-semibold text-foreground mb-1">{item.title}</h4>
-                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                        <h4 className="font-semibold text-foreground mb-1">{t.party.timeline[item.key].title}</h4>
+                        <p className="text-sm text-muted-foreground">{t.party.timeline[item.key].description}</p>
                       </div>
                     </div>
                     <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 w-4 h-4 rounded-full bg-blue-500 border-4 border-white shadow" />

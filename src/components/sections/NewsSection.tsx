@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Calendar, User, Eye, Loader2 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface News {
   id: string;
@@ -108,30 +109,23 @@ const mockNews: News[] = [
   },
 ];
 
-const categoryLabels: Record<string, string> = {
-  comunicado: "Comunicado",
-  imprensa: "Imprensa",
-  nota_oficial: "Nota Oficial",
-  artigo: "Artigo",
-  politica: "Política",
-  economia: "Economia",
-  social: "Social",
-  institucional: "Institucional",
+const categoryKeys: Record<string, keyof typeof import("@/lib/i18n/locales/pt").default.categories> = {
+  comunicado: "comunicado",
+  imprensa: "imprensa",
+  nota_oficial: "notaOficial",
+  artigo: "artigo",
+  politica: "politica",
+  economia: "economia",
+  social: "social",
+  institucional: "institucional",
 };
 
-const MONTHS_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return `${date.getDate()} de ${MONTHS_PT[date.getMonth()]} de ${date.getFullYear()}`;
-}
-
 export function NewsSection() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [news, setNews] = useState<News[]>(mockNews);
   const [loading, setLoading] = useState(true);
 
-  // Ordenar notícias: featured primeiro, depois por data
   const sortNews = (newsList: News[]) => {
     return [...newsList].sort((a, b) => {
       if (a.featured && !b.featured) return -1;
@@ -165,15 +159,25 @@ export function NewsSection() {
     router.push(`/noticia/${item.slug}`);
   };
 
+  const getCategoryLabel = (category: string) => {
+    const key = categoryKeys[category];
+    return key ? t.categories[key] : category;
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return `${date.getDate()} ${t.shared.dateSeparator} ${t.shared.months[date.getMonth()]} ${t.shared.dateSeparator} ${date.getFullYear()}`;
+  };
+
   return (
     <section id="noticias" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="mb-12">
           <span className="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
-            Notícias
+            {t.news.badge}
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-            Últimas <span className="text-party-blue">Notícias</span>
+            {t.news.heading.split(' ').slice(0, -1).join(' ')} <span className="text-party-blue">{t.news.heading.split(' ').slice(-1)}</span>
           </h2>
         </div>
 
@@ -183,7 +187,6 @@ export function NewsSection() {
           </div>
         ) : (
           <>
-            {/* Grid de Notícias - Todas com mesma altura, sem espaços vazios */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {news.slice(0, 6).map((item) => (
                 <Card
@@ -205,11 +208,11 @@ export function NewsSection() {
                     <div className="absolute top-3 left-3 flex gap-2">
                       {item.featured && (
                         <span className="px-2 py-1 rounded-full text-xs font-bold bg-amber-500 text-white animate-pulse">
-                          Destacada
+                          {t.news.featured}
                         </span>
                       )}
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
-                        {categoryLabels[item.category] || item.category}
+                        {getCategoryLabel(item.category)}
                       </span>
                     </div>
                   </div>
@@ -241,13 +244,12 @@ export function NewsSection() {
               ))}
             </div>
 
-            {/* Ver Todas Button */}
             <div className="text-center mt-10">
               <button
                 onClick={() => router.push('/noticias')}
                 className="inline-flex items-center px-6 py-3 border border-blue-300 text-blue-700 hover:bg-blue-600 hover:text-white rounded-lg transition-colors cursor-pointer"
               >
-                Ver Todas
+                {t.news.viewAll}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </div>

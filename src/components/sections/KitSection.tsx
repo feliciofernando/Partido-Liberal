@@ -11,6 +11,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Download, Image, FileText, Share2, Smartphone, FileImage, Loader2, Package } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 // Helper function to format numbers consistently (avoid hydration mismatch)
 function formatNumber(num: number): string {
@@ -28,70 +29,6 @@ interface KitItem {
   active: boolean;
 }
 
-// Mock data para quando não houver dados no Supabase
-const mockKitItems: KitItem[] = [
-  {
-    id: '1',
-    title: 'Banner Campanha 2025',
-    description: 'Banner oficial para divulgação em redes sociais e materiais impressos.',
-    type: 'banner',
-    fileUrl: '#',
-    thumbnail: '/images/kit/banner-campanha.png',
-    downloads: 1250,
-    active: true,
-  },
-  {
-    id: '2',
-    title: 'Avatar de Perfil Oficial',
-    description: 'Moldura circular para foto de perfil nas redes sociais.',
-    type: 'avatar',
-    fileUrl: '#',
-    thumbnail: '/images/kit/avatar-perfil.png',
-    downloads: 3420,
-    active: true,
-  },
-  {
-    id: '3',
-    title: 'Flyer Comício Regional',
-    description: 'Panfleto para divulgação de eventos e comícios. Pronto para impressão.',
-    type: 'flyer',
-    fileUrl: '#',
-    thumbnail: '/images/kit/flyer-evento.png',
-    downloads: 890,
-    active: true,
-  },
-  {
-    id: '4',
-    title: 'Stickers WhatsApp',
-    description: 'Pacote de stickers para WhatsApp com mensagens de apoio.',
-    type: 'sticker',
-    fileUrl: '#',
-    thumbnail: '/images/kit/sticker-whatsapp.png',
-    downloads: 5670,
-    active: true,
-  },
-  {
-    id: '5',
-    title: 'Documento Programa de Governo',
-    description: 'Documento oficial com o programa de governo completo.',
-    type: 'documento',
-    fileUrl: '#',
-    thumbnail: '/images/kit/documento-oficial.png',
-    downloads: 2150,
-    active: true,
-  },
-  {
-    id: '6',
-    title: 'Banner Redes Sociais',
-    description: 'Banner quadrado otimizado para Instagram e Facebook.',
-    type: 'banner',
-    fileUrl: '#',
-    thumbnail: '/images/kit/banner-social.png',
-    downloads: 1890,
-    active: true,
-  },
-];
-
 const typeIcons: Record<string, any> = {
   avatar: Image,
   sticker: Smartphone,
@@ -104,19 +41,86 @@ const typeIcons: Record<string, any> = {
   apresentacao: FileText,
 };
 
-const typeLabels: Record<string, string> = {
-  avatar: "Avatar",
-  sticker: "Sticker",
-  banner: "Banner",
-  flyer: "Flyer",
-  documento: "Documento",
-  imagem: "Imagem",
-  video: "Vídeo",
-  audio: "Áudio",
-  apresentacao: "Apresentação",
+// Map Portuguese type keys to English translation keys
+const typeKeyMap: Record<string, string> = {
+  avatar: "avatar",
+  sticker: "sticker",
+  banner: "banner",
+  flyer: "flyer",
+  documento: "document",
+  imagem: "image",
+  video: "video",
+  audio: "audio",
+  apresentacao: "presentation",
 };
 
+function getMockKitItems(t: any): KitItem[] {
+  return [
+    {
+      id: '1',
+      title: t.kit.mock.bannerCampaign,
+      description: t.kit.mock.bannerCampaignDesc,
+      type: 'banner',
+      fileUrl: '#',
+      thumbnail: '/images/kit/banner-campanha.png',
+      downloads: 1250,
+      active: true,
+    },
+    {
+      id: '2',
+      title: t.kit.mock.avatarProfile,
+      description: t.kit.mock.avatarProfileDesc,
+      type: 'avatar',
+      fileUrl: '#',
+      thumbnail: '/images/kit/avatar-perfil.png',
+      downloads: 3420,
+      active: true,
+    },
+    {
+      id: '3',
+      title: t.kit.mock.flyerRegional,
+      description: t.kit.mock.flyerRegionalDesc,
+      type: 'flyer',
+      fileUrl: '#',
+      thumbnail: '/images/kit/flyer-evento.png',
+      downloads: 890,
+      active: true,
+    },
+    {
+      id: '4',
+      title: t.kit.mock.stickersWhatsApp,
+      description: t.kit.mock.stickersWhatsAppDesc,
+      type: 'sticker',
+      fileUrl: '#',
+      thumbnail: '/images/kit/sticker-whatsapp.png',
+      downloads: 5670,
+      active: true,
+    },
+    {
+      id: '5',
+      title: t.kit.mock.govDoc,
+      description: t.kit.mock.govDocDesc,
+      type: 'documento',
+      fileUrl: '#',
+      thumbnail: '/images/kit/documento-oficial.png',
+      downloads: 2150,
+      active: true,
+    },
+    {
+      id: '6',
+      title: t.kit.mock.socialBanner,
+      description: t.kit.mock.socialBannerDesc,
+      type: 'banner',
+      fileUrl: '#',
+      thumbnail: '/images/kit/banner-social.png',
+      downloads: 1890,
+      active: true,
+    },
+  ];
+}
+
 export function KitSection() {
+  const { t } = useTranslation();
   const [kitItems, setKitItems] = useState<KitItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -129,11 +133,11 @@ export function KitSection() {
           setKitItems(data.items.filter((item: KitItem) => item.active));
         } else {
           // Usar dados de exemplo se não houver dados
-          setKitItems(mockKitItems);
+          setKitItems(getMockKitItems(t));
         }
       } catch (error) {
         console.error("Erro ao carregar kit items:", error);
-        setKitItems(mockKitItems);
+        setKitItems(getMockKitItems(t));
       } finally {
         setLoading(false);
       }
@@ -142,20 +146,24 @@ export function KitSection() {
     fetchKitItems();
   }, []);
 
+  const getTypeLabel = (type: string): string => {
+    const mappedKey = typeKeyMap[type] || type;
+    return (t.kit.types as Record<string, string>)[mappedKey] || type;
+  };
+
   return (
     <section id="kit" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <Badge className="bg-blue-100 text-blue-700 mb-4">
-            Kit Digital
+            {t.kit.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Kit de <span className="text-party-blue">Militância Digital</span>
+            {t.kit.heading}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Baixe materiais prontos para usar em suas redes sociais. Ajude a espalhar
-            a mensagem do Partido Liberal para todos os angolanos!
+            {t.kit.description}
           </p>
         </div>
 
@@ -170,14 +178,14 @@ export function KitSection() {
                   </div>
                   <div className="text-left flex-1">
                     <span className="font-semibold text-foreground text-lg">
-                      Materiais Disponíveis
+                      {t.kit.materialsTitle}
                     </span>
                     <p className="text-sm text-muted-foreground">
-                      Clique para expandir e ver todos os materiais para download
+                      {t.kit.materialsSubtitle}
                     </p>
                   </div>
                   <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                    {kitItems.length} itens
+                    {kitItems.length} {t.kit.items}
                   </Badge>
                 </div>
               </AccordionTrigger>
@@ -191,9 +199,9 @@ export function KitSection() {
                     <Card className="text-center py-12 border-dashed">
                       <CardContent>
                         <FileImage className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="font-semibold text-foreground mb-2">Nenhum material disponível</h3>
+                        <h3 className="font-semibold text-foreground mb-2">{t.kit.noMaterials}</h3>
                         <p className="text-muted-foreground">
-                          Novos materiais serão adicionados em breve. Fique atento!
+                          {t.kit.noMaterialsSoon}
                         </p>
                       </CardContent>
                     </Card>
@@ -221,7 +229,7 @@ export function KitSection() {
                               </div>
                             )}
                             <Badge className="absolute top-3 right-3 bg-white text-blue-700 border border-blue-200">
-                              {typeLabels[item.type] || item.type}
+                              {getTypeLabel(item.type)}
                             </Badge>
                           </div>
 
@@ -231,26 +239,26 @@ export function KitSection() {
                                 {item.title}
                               </h3>
                               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                {item.description || "Material para militância digital"}
+                                {item.description || t.kit.fallbackDesc}
                               </p>
                             </div>
 
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-muted-foreground flex items-center gap-1">
                                 <Download className="h-4 w-4" />
-                                {formatNumber(item.downloads)} downloads
+                                {formatNumber(item.downloads)} {t.kit.downloads}
                               </span>
                               {item.fileUrl ? (
                                 <Button size="sm" className="btn-cta" asChild>
                                   <a href={item.fileUrl} target="_blank" rel="noopener noreferrer">
                                     <Download className="h-4 w-4 mr-1" />
-                                    Baixar
+                                    {t.kit.download}
                                   </a>
                                 </Button>
                               ) : (
                                 <Button size="sm" className="btn-cta">
                                   <Download className="h-4 w-4 mr-1" />
-                                  Baixar
+                                  {t.kit.download}
                                 </Button>
                               )}
                             </div>
@@ -264,9 +272,9 @@ export function KitSection() {
                   <Card className="mt-6 bg-blue-gradient text-white border-0">
                     <CardContent className="p-6 text-center">
                       <Share2 className="h-10 w-10 mx-auto mb-3 opacity-80" />
-                      <h3 className="text-lg font-semibold mb-2">Compartilhe nas Redes Sociais</h3>
+                      <h3 className="text-lg font-semibold mb-2">{t.kit.shareTitle}</h3>
                       <p className="text-white/80 mb-4 text-sm">
-                        Use nossos materiais para mostrar seu apoio ao Partido Liberal.
+                        {t.kit.shareDescription}
                       </p>
                       <div className="flex flex-wrap justify-center gap-2">
                         <Button size="sm" className="bg-white text-blue-700 hover:bg-white/90">

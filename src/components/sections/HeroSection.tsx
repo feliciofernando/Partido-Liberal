@@ -6,6 +6,7 @@ import { ArrowRight, Megaphone } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface SiteConfig {
   heroImage?: string;
@@ -26,26 +27,30 @@ interface SiteConfig {
   stat4Label?: string;
 }
 
-const defaultConfig: SiteConfig = {
-  heroImage: '',
-  heroBadge: 'Eleições 2025 - Juntos pelo Futuro de Angola',
-  heroTitle: 'Construindo um Angola Melhor para Todos',
-  heroSubtitle: 'O Partido Liberal é a voz da mudança, da liberdade e do progresso. Junte-se a nós nesta jornada rumo a um futuro próspero e justo para todos os angolanos.',
-  heroButtonText1: 'Seja Voluntário',
-  heroButtonLink1: '#voluntarios',
-  heroButtonText2: 'Conheça Nosso Programa',
-  heroButtonLink2: '#programa',
-  stat1Value: '15K+',
-  stat1Label: 'Voluntários Ativos',
-  stat2Value: '18',
-  stat2Label: 'Províncias Presentes',
-  stat3Value: '50+',
-  stat3Label: 'Eventos Este Mês',
-  stat4Value: '100K+',
-  stat4Label: 'Apoiantes',
-};
+export function getHeroDefaults(t: any) {
+  return {
+    heroImage: '',
+    heroBadge: t.hero.badge,
+    heroTitle: t.hero.title,
+    heroSubtitle: t.hero.subtitle,
+    heroButtonText1: t.hero.cta1,
+    heroButtonLink1: '#voluntarios',
+    heroButtonText2: t.hero.cta2,
+    heroButtonLink2: '#programa',
+    stat1Value: '15K+',
+    stat1Label: t.hero.stat1,
+    stat2Value: '18',
+    stat2Label: t.hero.stat2,
+    stat3Value: '50+',
+    stat3Label: t.hero.stat3,
+    stat4Value: '100K+',
+    stat4Label: t.hero.stat4,
+  };
+}
 
 export function HeroSection() {
+  const { t } = useTranslation();
+  const defaultConfig = getHeroDefaults(t);
   const [config, setConfig] = useState<SiteConfig>(defaultConfig);
 
   useEffect(() => {
@@ -64,7 +69,7 @@ export function HeroSection() {
   }, []);
 
   // Parse title to highlight "Angola Melhor" part
-  const titleParts = config.heroTitle?.split('Angola') || ['Construindo um Angola Melhor para Todos'];
+  const titleParts = config.heroTitle?.split('Angola') || [t.hero.title];
   const hasHighlight = config.heroTitle?.includes('Angola');
 
   return (
@@ -74,7 +79,7 @@ export function HeroSection() {
         {config.heroImage ? (
           <Image
             src={config.heroImage}
-            alt="Partido Liberal - Campanha"
+            alt={t.hero.imageAlt}
             fill
             className="object-cover"
             priority
@@ -110,7 +115,7 @@ export function HeroSection() {
                 <span className="text-party-yellow">Angola{titleParts.slice(1).join('Angola')}</span>
               </>
             ) : (
-              config.heroTitle || 'Construindo um Angola Melhor para Todos'
+              config.heroTitle || t.hero.title
             )}
           </h1>
 

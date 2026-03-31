@@ -20,6 +20,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 const mockResults = [
   { province: "Luanda", votes: 125000, percentage: 62, reported: 95 },
@@ -30,16 +31,17 @@ const mockResults = [
   { province: "Lunda Sul", votes: 12000, percentage: 70, reported: 85 },
 ];
 
-// Formatação consistente sem depender de locale
-function formatVotes(votes: number): string {
-  if (votes >= 1000) {
-    return `${Math.floor(votes / 1000)} mil`;
-  }
-  return String(votes);
-}
-
 export function ElectionResultsSection() {
+  const { t } = useTranslation();
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Formatação consistente sem depender de locale
+  function formatVotes(votes: number): string {
+    if (votes >= 1000) {
+      return `${Math.floor(votes / 1000)} ${t.elections.thousands}`;
+    }
+    return String(votes);
+  }
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -56,14 +58,13 @@ export function ElectionResultsSection() {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <Badge className="bg-blue-100 text-blue-700 mb-4">
             <BarChart3 className="h-3 w-3 mr-1" />
-            Resultados
+            {t.elections.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Acompanhamento <span className="text-party-blue">Eleitoral</span>
+            {t.elections.heading}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Acompanhe em tempo real os resultados apurados pelos nossos fiscais.
-            Transparência e democracia em primeiro lugar.
+            {t.elections.description}
           </p>
         </div>
 
@@ -78,14 +79,14 @@ export function ElectionResultsSection() {
                   </div>
                   <div className="text-left flex-1">
                     <span className="font-semibold text-foreground text-lg">
-                      Prévia dos Resultados Eleitorais
+                      {t.elections.previewTitle}
                     </span>
                     <p className="text-sm text-muted-foreground">
-                      Clique para expandir e ver os dados detalhados por província
+                      {t.elections.previewSubtitle}
                     </p>
                   </div>
                   <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-                    Em breve
+                    {t.elections.comingSoon}
                   </Badge>
                 </div>
               </AccordionTrigger>
@@ -100,8 +101,8 @@ export function ElectionResultsSection() {
                             <CheckCircle2 className="h-5 w-5 text-white" />
                           </div>
                           <div>
-                            <h3 className="font-semibold">Apuração em Andamento</h3>
-                            <p className="text-white/80 text-sm">Última atualização: há 5 minutos</p>
+                            <h3 className="font-semibold">{t.elections.countingTitle}</h3>
+                            <p className="text-white/80 text-sm">{t.elections.countingSubtitle}</p>
                           </div>
                         </div>
                         <Button
@@ -111,7 +112,7 @@ export function ElectionResultsSection() {
                           className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                         >
                           <RefreshCw className={`mr-2 h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} />
-                          Atualizar
+                          {t.elections.refresh}
                         </Button>
                       </div>
                     </CardContent>
@@ -123,28 +124,28 @@ export function ElectionResultsSection() {
                       <CardContent className="p-4 text-center">
                         <TrendingUp className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">{avgPercentage}%</div>
-                        <div className="text-xs text-muted-foreground">Média Nacional</div>
+                        <div className="text-xs text-muted-foreground">{t.elections.nationalAverage}</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
                         <Users className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">270K</div>
-                        <div className="text-xs text-muted-foreground">Votos Apurados</div>
+                        <div className="text-xs text-muted-foreground">{t.elections.countedVotes}</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
                         <MapPin className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">18</div>
-                        <div className="text-xs text-muted-foreground">Províncias</div>
+                        <div className="text-xs text-muted-foreground">{t.elections.provinces}</div>
                       </CardContent>
                     </Card>
                     <Card className="border shadow-sm">
                       <CardContent className="p-4 text-center">
                         <Clock className="h-7 w-7 text-blue-600 mx-auto mb-2" />
                         <div className="text-xl font-bold text-foreground">85%</div>
-                        <div className="text-xs text-muted-foreground">Mesas Apuradas</div>
+                        <div className="text-xs text-muted-foreground">{t.elections.countedTables}</div>
                       </CardContent>
                     </Card>
                   </div>
@@ -152,8 +153,8 @@ export function ElectionResultsSection() {
                   {/* Results by Province */}
                   <Card className="border shadow-sm">
                     <CardHeader className="pb-2 pt-4">
-                      <h3 className="text-lg font-semibold text-foreground">Resultados por Província</h3>
-                      <p className="text-sm text-muted-foreground">Dados apurados pelos fiscais do Partido Liberal</p>
+                      <h3 className="text-lg font-semibold text-foreground">{t.elections.resultsByProvince}</h3>
+                      <p className="text-sm text-muted-foreground">{t.elections.resultsSubtitle}</p>
                     </CardHeader>
                     <CardContent className="p-0">
                       <div className="divide-y">
@@ -164,13 +165,13 @@ export function ElectionResultsSection() {
                                 <span className="text-sm font-medium text-muted-foreground w-6">{index + 1}</span>
                                 <span className="font-medium text-foreground">{result.province}</span>
                                 <Badge variant="outline" className="text-xs border-blue-200 text-blue-600">
-                                  {result.reported}% apurado
+                                  {result.reported}% {t.elections.counted}
                                 </Badge>
                               </div>
                               <div className="text-right">
                                 <span className="font-bold text-blue-700 text-lg">{result.percentage}%</span>
                                 <p className="text-xs text-muted-foreground">
-                                  {formatVotes(result.votes)} votos
+                                  {formatVotes(result.votes)} {t.elections.votes}
                                 </p>
                               </div>
                             </div>
@@ -185,8 +186,7 @@ export function ElectionResultsSection() {
                   <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-700 flex items-start gap-2">
                       <CheckCircle2 className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-500" />
-                      Estes são dados preliminares apurados pelos fiscais do Partido Liberal.
-                      Os resultados oficiais serão divulgados pela Comissão Nacional Eleitoral.
+                      {t.elections.disclaimer}
                     </p>
                   </div>
                 </div>

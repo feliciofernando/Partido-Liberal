@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface Leader {
   id: string;
@@ -137,6 +138,7 @@ const mockLeaders: Leader[] = [
 ];
 
 export function LeadersSection() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [leaders, setLeaders] = useState<Leader[]>(mockLeaders);
   const [loading, setLoading] = useState(true);
@@ -166,13 +168,13 @@ export function LeadersSection() {
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block px-4 py-1.5 bg-slate-100 text-slate-700 text-sm font-medium rounded-full mb-4">
-              Liderança
+              {t.leaders.badge}
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Nossos <span className="text-party-blue">Líderes</span>
+              {t.leaders.heading.split(' ').slice(0, -1).join(' ')} <span className="text-party-blue">{t.leaders.heading.split(' ').slice(-1)}</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Conheça os homens e mulheres dedicados que lideram nossa luta por um Angola melhor.
+              {t.leaders.description}
             </p>
           </div>
 
@@ -227,7 +229,7 @@ export function LeadersSection() {
               className="border-blue-300 text-blue-700 hover:bg-blue-50"
               onClick={() => router.push('/lideres')}
             >
-              Ver Todos os Candidatos
+              {t.leaders.viewAll}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>
@@ -240,7 +242,7 @@ export function LeadersSection() {
           {selectedLeader && (
             <>
               <DialogHeader>
-                <DialogTitle className="text-xl">Perfil do Líder</DialogTitle>
+                <DialogTitle className="text-xl">{t.leaders.profileTitle}</DialogTitle>
               </DialogHeader>
 
               <div className="space-y-6">
@@ -279,10 +281,10 @@ export function LeadersSection() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                     <User className="w-5 h-5 text-blue-500" />
-                    Biografia
+                    {t.leaders.biography}
                   </h3>
                   <p className="text-muted-foreground">
-                    {selectedLeader.bio || "Biografia não disponível."}
+                    {selectedLeader.bio || t.leaders.bioNotAvailable}
                   </p>
                 </div>
 
@@ -291,7 +293,7 @@ export function LeadersSection() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-2 flex items-center gap-2">
                       <FileText className="w-5 h-5 text-blue-500" />
-                      Propostas
+                      {t.leaders.proposals}
                     </h3>
                     <p className="text-muted-foreground">
                       {selectedLeader.proposals}
@@ -303,7 +305,7 @@ export function LeadersSection() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-blue-500" />
-                    Redes Sociais
+                    {t.leaders.socialNetworks}
                   </h3>
                   <div className="flex flex-wrap gap-3">
                     {selectedLeader.socialFacebook && (
@@ -347,7 +349,7 @@ export function LeadersSection() {
                       </Button>
                     )}
                     {!selectedLeader.socialFacebook && !selectedLeader.socialTwitter && !selectedLeader.socialInstagram && !selectedLeader.socialLinkedin && (
-                      <p className="text-sm text-muted-foreground">Nenhuma rede social cadastrada.</p>
+                      <p className="text-sm text-muted-foreground">{t.leaders.noSocial}</p>
                     )}
                   </div>
                 </div>

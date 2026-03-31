@@ -23,6 +23,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/lib/i18n";
 
 // Helper function to format numbers consistently (avoid hydration mismatch)
 function formatNumber(num: number): string {
@@ -36,13 +37,8 @@ const provinces = [
   "Namibe", "Uíge", "Zaire"
 ];
 
-const interestAreas = [
-  { id: "campanha", label: "Campanha Eleitoral" },
-  { id: "eventos", label: "Organização de Eventos" },
-  { id: "comunicacao", label: "Comunicação e Redes Sociais" },
-  { id: "fiscal", label: "Fiscalização Eleitoral" },
-  { id: "mobilizacao", label: "Mobilização Comunitária" },
-  { id: "administrativo", label: "Apoio Administrativo" },
+const interestAreaIds = [
+  "campanha", "eventos", "comunicacao", "fiscal", "mobilizacao", "administrativo",
 ];
 
 interface VolunteerStats {
@@ -51,6 +47,7 @@ interface VolunteerStats {
 }
 
 export function VolunteersSection() {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [stats, setStats] = useState<VolunteerStats>({ total: 15000, fiscals: 3850 });
@@ -131,14 +128,13 @@ export function VolunteersSection() {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge className="bg-blue-100 text-blue-700 mb-4">
-            Junte-se a Nós
+            {t.volunteers.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Seja um <span className="text-party-blue">Voluntário</span>
+            {t.volunteers.heading}
           </h2>
           <p className="text-lg text-muted-foreground">
-            Faça parte da mudança! Cadastre-se como voluntário e ajude-nos a construir
-            um Angola melhor. Precisamos de pessoas comprometidas como você.
+            {t.volunteers.description}
           </p>
         </div>
 
@@ -152,15 +148,14 @@ export function VolunteersSection() {
                     <Users className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">Voluntário de Campanha</h3>
-                    <p className="text-sm text-muted-foreground">Apoie nossas atividades</p>
+                    <h3 className="font-semibold text-foreground">{t.volunteers.cards.campaign.title}</h3>
+                    <p className="text-sm text-muted-foreground">{t.volunteers.cards.campaign.subtitle}</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Ajude na organização de eventos, mobilização comunitária, distribuição
-                  de materiais e muito mais. Sua participação é fundamental!
+                  {t.volunteers.cards.campaign.description}
                 </p>
               </CardContent>
             </Card>
@@ -172,15 +167,14 @@ export function VolunteersSection() {
                     <Shield className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground">Fiscal de Mesa</h3>
-                    <p className="text-sm text-muted-foreground">Garanta eleições justas</p>
+                    <h3 className="font-semibold text-foreground">{t.volunteers.cards.pollWatcher.title}</h3>
+                    <p className="text-sm text-muted-foreground">{t.volunteers.cards.pollWatcher.subtitle}</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Seja fiscal de mesa no dia da eleição. Receba treinamento e ajude a
-                  garantir um processo eleitoral transparente e democrático.
+                  {t.volunteers.cards.pollWatcher.description}
                 </p>
               </CardContent>
             </Card>
@@ -190,28 +184,22 @@ export function VolunteersSection() {
               <Card className="bg-blue-gradient text-white border-0">
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold mb-1">{formatNumber(stats.total)}</div>
-                  <div className="text-white/80 text-sm">Voluntários Ativos</div>
+                  <div className="text-white/80 text-sm">{t.volunteers.stats.activeVolunteers}</div>
                 </CardContent>
               </Card>
               <Card className="bg-blue-gradient-dark text-white border-0">
                 <CardContent className="p-6 text-center">
                   <div className="text-3xl font-bold mb-1">{formatNumber(stats.fiscals)}</div>
-                  <div className="text-white/80 text-sm">Fiscais Treinados</div>
+                  <div className="text-white/80 text-sm">{t.volunteers.stats.trainedWatchers}</div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Benefits */}
             <div className="bg-white rounded-xl p-6 shadow-md">
-              <h4 className="font-semibold text-foreground mb-4">Benefícios de ser Voluntário</h4>
+              <h4 className="font-semibold text-foreground mb-4">{t.volunteers.benefits.heading}</h4>
               <ul className="space-y-3">
-                {[
-                  "Certificado de participação",
-                  "Treinamentos exclusivos",
-                  "Acesso a eventos do partido",
-                  "Networking com lideranças",
-                  "Material de apoio gratuito",
-                ].map((benefit, i) => (
+                {t.volunteers.benefits.items.map((benefit, i) => (
                   <li key={i} className="flex items-center gap-3 text-muted-foreground">
                     <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0" />
                     {benefit}
@@ -224,8 +212,8 @@ export function VolunteersSection() {
           {/* Form */}
           <Card className="border-0 shadow-lg">
             <CardHeader className="bg-blue-gradient text-white rounded-t-lg">
-              <h3 className="text-xl font-semibold">Formulário de Cadastro</h3>
-              <p className="text-white/80 text-sm">Preencha seus dados para participar</p>
+              <h3 className="text-xl font-semibold">{t.volunteers.form.title}</h3>
+              <p className="text-white/80 text-sm">{t.volunteers.form.subtitle}</p>
             </CardHeader>
             <CardContent className="p-6">
               {isSuccess ? (
@@ -234,10 +222,10 @@ export function VolunteersSection() {
                     <CheckCircle className="h-8 w-8 text-blue-600" />
                   </div>
                   <h4 className="text-xl font-semibold text-foreground mb-2">
-                    Cadastro Realizado!
+                    {t.volunteers.form.successTitle}
                   </h4>
                   <p className="text-muted-foreground mb-6">
-                    Obrigado pelo seu interesse. Nossa equipe entrará em contato em breve.
+                    {t.volunteers.form.successDescription}
                   </p>
                   <Button
                     onClick={() => {
@@ -256,7 +244,7 @@ export function VolunteersSection() {
                     }}
                     variant="outline"
                   >
-                    Novo Cadastro
+                    {t.volunteers.form.newRegistration}
                   </Button>
                 </div>
               ) : (
@@ -264,17 +252,17 @@ export function VolunteersSection() {
                   {/* Personal Info */}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Nome Completo *</Label>
+                      <Label htmlFor="name">{t.volunteers.form.fullName}</Label>
                       <Input
                         id="name"
-                        placeholder="Seu nome"
+                        placeholder={t.volunteers.form.fullNamePlaceholder}
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Telefone/WhatsApp *</Label>
+                      <Label htmlFor="phone">{t.volunteers.form.phone}</Label>
                       <Input
                         id="phone"
                         placeholder="+244 9XX XXX XXX"
@@ -286,7 +274,7 @@ export function VolunteersSection() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">{t.volunteers.form.email}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -300,13 +288,13 @@ export function VolunteersSection() {
                   {/* Location */}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Província *</Label>
+                      <Label>{t.volunteers.form.province}</Label>
                       <Select
                         value={formData.province}
                         onValueChange={(value) => setFormData({ ...formData, province: value })}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecione" />
+                          <SelectValue placeholder={t.volunteers.form.selectPlaceholder} />
                         </SelectTrigger>
                         <SelectContent>
                           {provinces.map((p) => (
@@ -318,10 +306,10 @@ export function VolunteersSection() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="municipality">Município</Label>
+                      <Label htmlFor="municipality">{t.volunteers.form.municipality}</Label>
                       <Input
                         id="municipality"
-                        placeholder="Seu município"
+                        placeholder={t.volunteers.form.municipalityPlaceholder}
                         value={formData.municipality}
                         onChange={(e) => setFormData({ ...formData, municipality: e.target.value })}
                       />
@@ -330,38 +318,38 @@ export function VolunteersSection() {
 
                   {/* Availability */}
                   <div className="space-y-2">
-                    <Label>Disponibilidade</Label>
+                    <Label>{t.volunteers.form.availability}</Label>
                     <Select
                       value={formData.availability}
                       onValueChange={(value) => setFormData({ ...formData, availability: value })}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione sua disponibilidade" />
+                        <SelectValue placeholder={t.volunteers.form.availabilityPlaceholder} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="tempo_integral">Tempo Integral</SelectItem>
-                        <SelectItem value="fins_semana">Fins de Semana</SelectItem>
-                        <SelectItem value="horario_noturno">Horário Noturno</SelectItem>
-                        <SelectItem value="flexivel">Flexível</SelectItem>
+                        <SelectItem value="tempo_integral">{t.shared.availability.fullTime}</SelectItem>
+                        <SelectItem value="fins_semana">{t.shared.availability.weekends}</SelectItem>
+                        <SelectItem value="horario_noturno">{t.shared.availability.nightShift}</SelectItem>
+                        <SelectItem value="flexivel">{t.shared.availability.flexible}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   {/* Interests */}
                   <div className="space-y-3">
-                    <Label>Áreas de Interesse</Label>
+                    <Label>{t.volunteers.form.interestAreas}</Label>
                     <div className="grid grid-cols-2 gap-3">
-                      {interestAreas.map((area) => (
-                        <div key={area.id} className="flex items-center space-x-2">
+                      {interestAreaIds.map((areaId, index) => (
+                        <div key={areaId} className="flex items-center space-x-2">
                           <Checkbox
-                            id={area.id}
-                            checked={formData.interests.includes(area.id)}
+                            id={areaId}
+                            checked={formData.interests.includes(areaId)}
                             onCheckedChange={(checked) =>
-                              handleInterestChange(area.id, checked as boolean)
+                              handleInterestChange(areaId, checked as boolean)
                             }
                           />
-                          <Label htmlFor={area.id} className="text-sm font-normal cursor-pointer">
-                            {area.label}
+                          <Label htmlFor={areaId} className="text-sm font-normal cursor-pointer">
+                            {t.volunteers.form.areas[index]}
                           </Label>
                         </div>
                       ))}
@@ -370,10 +358,10 @@ export function VolunteersSection() {
 
                   {/* Experience */}
                   <div className="space-y-2">
-                    <Label htmlFor="experience">Experiência Relevante</Label>
+                    <Label htmlFor="experience">{t.volunteers.form.experience}</Label>
                     <Textarea
                       id="experience"
-                      placeholder="Conte-nos sobre sua experiência anterior..."
+                      placeholder={t.volunteers.form.experiencePlaceholder}
                       value={formData.experience}
                       onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
                       rows={3}
@@ -391,10 +379,10 @@ export function VolunteersSection() {
                     />
                     <div>
                       <Label htmlFor="isFiscal" className="font-medium cursor-pointer">
-                        Quero ser Fiscal de Mesa
+                        {t.volunteers.form.pollWatcher}
                       </Label>
                       <p className="text-sm text-muted-foreground">
-                        Receberei treinamento para atuar como fiscal no dia da eleição.
+                        {t.volunteers.form.pollWatcherDesc}
                       </p>
                     </div>
                   </div>
@@ -404,12 +392,12 @@ export function VolunteersSection() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Enviando...
+                        {t.volunteers.form.submitting}
                       </>
                     ) : (
                       <>
                         <Send className="mr-2 h-4 w-4" />
-                        Cadastrar como Voluntário
+                        {t.volunteers.form.submit}
                       </>
                     )}
                   </Button>

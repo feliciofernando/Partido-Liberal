@@ -18,6 +18,7 @@ import {
   MapPin,
   X,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface News {
   id: string;
@@ -65,36 +66,16 @@ const categoryColors: Record<string, string> = {
   institucional: "bg-slate-100 text-slate-700",
 };
 
-const categoryLabels: Record<string, string> = {
-  comunicado: "Comunicado",
-  imprensa: "Imprensa",
-  nota_oficial: "Nota Oficial",
-  artigo: "Artigo",
-  politica: "Política",
-  economia: "Economia",
-  social: "Social",
-  institucional: "Institucional",
+const categoryKeys: Record<string, keyof typeof import("@/lib/i18n/locales/pt").default.categories> = {
+  comunicado: "comunicado",
+  imprensa: "imprensa",
+  nota_oficial: "notaOficial",
+  artigo: "artigo",
+  politica: "politica",
+  economia: "economia",
+  social: "social",
+  institucional: "institucional",
 };
-
-const MONTHS_PT = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-];
-
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return `${date.getDate()} de ${MONTHS_PT[date.getMonth()]} de ${date.getFullYear()}`;
-}
 
 function formatShortDate(dateStr: string) {
   const date = new Date(dateStr);
@@ -116,22 +97,31 @@ export function NewsDetailModal({
   onNewsClick,
   allNews,
 }: NewsDetailModalProps) {
+  const { t } = useTranslation();
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const getCategoryLabel = (category: string) => {
+    const key = categoryKeys[category];
+    return key ? t.categories[key] : category;
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return `${date.getDate()} ${t.shared.dateSeparator} ${t.shared.months[date.getMonth()]} ${t.shared.dateSeparator} ${date.getFullYear()}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch events
         const eventsRes = await fetch("/api/events?upcoming=true");
         const eventsData = await eventsRes.json();
         if (eventsData.events && eventsData.events.length > 0) {
           setRelatedEvents(eventsData.events.slice(0, 3));
         }
 
-        // Fetch leaders
         const leadersRes = await fetch("/api/admin/posts?table=Leader");
         const leadersData = await leadersRes.json();
         if (leadersData.data && leadersData.data.length > 0) {
@@ -167,7 +157,6 @@ export function NewsDetailModal({
         console.log("Error sharing");
       }
     } else {
-      // Fallback to WhatsApp
       window.open(
         `https://wa.me/?text=${encodeURIComponent(news.title + " - Partido Liberal")}`,
         "_blank"
@@ -194,18 +183,16 @@ export function NewsDetailModal({
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               
-              {/* Category Badge */}
               <div className="absolute top-4 left-4">
                 <Badge
                   className={`${
                     categoryColors[news.category] || "bg-gray-500 text-white"
                   } text-sm px-3 py-1`}
                 >
-                  {categoryLabels[news.category] || news.category}
+                  {getCategoryLabel(news.category)}
                 </Badge>
               </div>
 
-              {/* Close Button */}
               <button
                 onClick={() => onOpenChange(false)}
                 className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm text-white flex items-center justify-center hover:bg-black/50 transition-colors"
@@ -213,7 +200,6 @@ export function NewsDetailModal({
                 <X className="w-5 h-5" />
               </button>
 
-              {/* Title Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
                   {news.title}
@@ -224,7 +210,6 @@ export function NewsDetailModal({
             {/* Article Content */}
             <ScrollArea className="flex-1">
               <div className="p-6">
-                {/* Meta Info */}
                 <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-6">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
@@ -238,26 +223,23 @@ export function NewsDetailModal({
                   </div>
                   <div className="flex items-center gap-2">
                     <Eye className="w-4 h-4" />
-                    <span>{news.views || 0} visualizações</span>
+                    <span>{news.views || 0} {t.news.views}</span>
                   </div>
                 </div>
 
-                {/* Summary */}
                 <p className="text-lg text-foreground/80 font-medium mb-6 leading-relaxed border-l-4 border-party-blue pl-4 py-2 bg-muted/30">
                   {news.summary}
                 </p>
 
-                {/* Content */}
                 <div
                   className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/80 prose-a:text-party-blue prose-strong:text-foreground"
                   dangerouslySetInnerHTML={{ __html: news.content }}
                 />
 
-                {/* Share Section */}
                 <Separator className="my-8" />
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="text-sm text-muted-foreground">
-                    Gostou desta notícia? Compartilhe!
+                    {t.news.sharePrompt}
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -266,7 +248,7 @@ export function NewsDetailModal({
                       className="border-party-blue text-party-blue hover:bg-party-blue hover:text-white"
                     >
                       <Share2 className="w-4 h-4 mr-2" />
-                      Compartilhar
+                      {t.news.shareBtn}
                     </Button>
                     <Button
                       onClick={() =>
@@ -302,7 +284,7 @@ export function NewsDetailModal({
                 <div>
                   <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                     <ChevronRight className="w-4 h-4 text-party-blue" />
-                    Outras Notícias
+                    {t.news.otherNews}
                   </h3>
                   <div className="space-y-3">
                     {otherNews.map((item) => (
@@ -318,7 +300,7 @@ export function NewsDetailModal({
                             "bg-gray-100 text-gray-700"
                           }`}
                         >
-                          {categoryLabels[item.category] || item.category}
+                          {getCategoryLabel(item.category)}
                         </Badge>
                         <h4 className="font-medium text-sm text-foreground group-hover:text-party-blue transition-colors line-clamp-2">
                           {item.title}
@@ -336,7 +318,7 @@ export function NewsDetailModal({
                   <div>
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <ChevronRight className="w-4 h-4 text-party-blue" />
-                      Próximos Eventos
+                      {t.events.heading}
                     </h3>
                     <div className="space-y-3">
                       {relatedEvents.map((event) => (
@@ -350,10 +332,7 @@ export function NewsDetailModal({
                                 {new Date(event.date).getDate()}
                               </span>
                               <span className="text-[10px] uppercase">
-                                {MONTHS_PT[new Date(event.date).getMonth()].slice(
-                                  0,
-                                  3
-                                )}
+                                {t.shared.monthsShort[new Date(event.date).getMonth()]}
                               </span>
                             </div>
                             <div className="flex-1 min-w-0">
@@ -377,7 +356,7 @@ export function NewsDetailModal({
                   <div>
                     <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                       <ChevronRight className="w-4 h-4 text-party-blue" />
-                      Nossa Liderança
+                      {t.leaders.heading}
                     </h3>
                     <div className="space-y-3">
                       {leaders.map((leader) => (
@@ -416,9 +395,9 @@ export function NewsDetailModal({
 
                 {/* CTA Card */}
                 <div className="p-4 rounded-lg bg-gradient-to-br from-party-blue to-party-blue-dark text-white">
-                  <h4 className="font-semibold mb-2">Junte-se a nós!</h4>
+                  <h4 className="font-semibold mb-2">{t.leaders.joinUs}</h4>
                   <p className="text-sm text-white/80 mb-3">
-                    Faça parte da mudança. Cadastre-se como voluntário.
+                    {t.leaders.joinDescShort}
                   </p>
                   <Button
                     className="w-full bg-party-yellow text-party-blue-dark hover:bg-party-yellow/90"
@@ -429,7 +408,7 @@ export function NewsDetailModal({
                         ?.scrollIntoView({ behavior: "smooth" });
                     }}
                   >
-                    Ser Voluntário
+                    {t.leaders.beVolunteer}
                   </Button>
                 </div>
               </div>

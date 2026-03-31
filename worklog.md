@@ -1,6 +1,20 @@
 # Partido Liberal - Worklog
 
 ---
+Task ID: 3
+Agent: layout-updater
+Task: Update Header, Footer, AlertBanner with i18n translations
+
+Work Log:
+- Read and updated Header.tsx with navigation translations and LanguageSwitcher
+- Read and updated Footer.tsx with all footer text translations
+- Read and updated AlertBanner.tsx with alert text translations
+
+Stage Summary:
+- All layout components now use useTranslation() from @/lib/i18n
+- LanguageSwitcher added to Header desktop navigation
+
+---
 Task ID: 5
 Agent: Main Agent
 Task: Remover tema escuro/quase preto e substituir por azul gradiente em todo o site
@@ -236,3 +250,28 @@ Stage Summary:
 - Multi-turn conversation support with memory
 - Lint passes with zero errors
 - Dev server compiles successfully
+
+---
+Task ID: 4-d
+Agent: sections-updater-4
+Task: Update VolunteersSection, ComplaintsSection with i18n translations
+
+Work Log:
+- Updated VolunteersSection.tsx with all volunteer form and section text translations
+- Updated ComplaintsSection.tsx with all ombudsman form and section text translations
+
+Stage Summary:
+- Volunteers, Complaints sections now use useTranslation() from @/lib/i18n
+
+---
+Task ID: 4-b
+Agent: sections-updater-2
+Task: Update EventsSection, LeadersSection, ProgramSection with i18n translations
+
+Work Log:
+- Updated EventsSection.tsx with all events text translations
+- Updated LeadersSection.tsx with leadership text translations
+- Updated ProgramSection.tsx with all program areas translations
+
+Stage Summary:
+- Events, Leaders, Program sections now use useTranslation() from @/lib/i18n

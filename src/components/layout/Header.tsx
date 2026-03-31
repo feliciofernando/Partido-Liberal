@@ -16,20 +16,24 @@ import {
   Bars3Icon,
   BuildingLibraryIcon,
 } from "@heroicons/react/24/outline";
+import { useTranslation } from "@/lib/i18n";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 
-const navigation = [
-  { name: "Início", href: "#inicio" },
-  { name: "O Partido", href: "#partido" },
-  { name: "Liderança", href: "#lideranca" },
-  { name: "Notícias", href: "#noticias" },
-  { name: "Agenda", href: "#eventos" },
-  { name: "Programa", href: "#programa" },
-  { name: "Kit Digital", href: "#kit" },
-  { name: "Ouvidoria", href: "#ouvidoria" },
+// Navigation item keys map to translation keys and hrefs
+const navItems = [
+  { key: "home" as const, href: "#inicio" },
+  { key: "party" as const, href: "#partido" },
+  { key: "leadership" as const, href: "#lideranca" },
+  { key: "news" as const, href: "#noticias" },
+  { key: "agenda" as const, href: "#eventos" },
+  { key: "program" as const, href: "#programa" },
+  { key: "digitalKit" as const, href: "#kit" },
+  { key: "ombudsman" as const, href: "#ouvidoria" },
 ];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
@@ -44,7 +48,7 @@ export function Header() {
               PARTIDO LIBERAL
             </span>
             <span className="text-xs text-muted-foreground leading-tight">
-              Construindo o Futuro
+              {t.nav.tagline}
             </span>
           </div>
         </Link>
@@ -52,8 +56,8 @@ export function Header() {
         {/* Desktop Navigation */}
         <NavigationMenu className="hidden lg:flex">
           <NavigationMenuList>
-            {navigation.map((item) => (
-              <NavigationMenuItem key={item.name}>
+            {navItems.map((item) => (
+              <NavigationMenuItem key={item.key}>
                 <NavigationMenuLink asChild>
                   <Link
                     href={item.href}
@@ -62,7 +66,7 @@ export function Header() {
                       "text-sm font-medium text-slate-600 hover:text-slate-900"
                     )}
                   >
-                    {item.name}
+                    {t.nav[item.key]}
                   </Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
@@ -72,9 +76,10 @@ export function Header() {
 
         {/* CTA Button */}
         <div className="hidden lg:flex items-center gap-4">
+          <LanguageSwitcher />
           <Link href="#voluntarios">
             <Button className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6">
-              Seja Voluntário
+              {t.nav.beVolunteer}
             </Button>
           </Link>
         </div>
@@ -84,7 +89,7 @@ export function Header() {
           <SheetTrigger asChild className="lg:hidden">
             <Button variant="ghost" size="icon">
               <Bars3Icon className="h-6 w-6" />
-              <span className="sr-only">Abrir menu</span>
+              <span className="sr-only">{t.nav.openMenu}</span>
             </Button>
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px] sm:w-[350px]">
@@ -99,21 +104,21 @@ export function Header() {
                     PARTIDO LIBERAL
                   </span>
                   <span className="text-xs text-muted-foreground leading-tight">
-                    Construindo o Futuro
+                    {t.nav.tagline}
                   </span>
                 </div>
               </div>
 
               {/* Mobile Navigation */}
               <nav className="flex flex-col gap-2">
-                {navigation.map((item) => (
+                {navItems.map((item) => (
                   <Link
-                    key={item.name}
+                    key={item.key}
                     href={item.href}
                     onClick={() => setIsOpen(false)}
                     className="flex items-center gap-3 px-4 py-3 text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors"
                   >
-                    {item.name}
+                    {t.nav[item.key]}
                   </Link>
                 ))}
               </nav>
@@ -122,7 +127,7 @@ export function Header() {
               <div className="mt-auto pt-6 border-t">
                 <Link href="#voluntarios" onClick={() => setIsOpen(false)}>
                   <Button className="w-full py-6 text-lg bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold">
-                    Seja Voluntário
+                    {t.nav.beVolunteer}
                   </Button>
                 </Link>
               </div>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 import {
   Send,
   X,
@@ -23,14 +24,8 @@ interface Message {
   timestamp: Date;
 }
 
-const quickQuestions = [
-  "Quem é o presidente do PL?",
-  "Quais as propostas do partido?",
-  "Como me voluntariar?",
-  "Quais os próximos eventos?",
-];
-
 export function AIAssistant() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -89,7 +84,7 @@ export function AIAssistant() {
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.response || "Desculpe, não consegui responder.",
+        content: data.response || t.assistant.fallback,
         timestamp: new Date(),
       };
 
@@ -98,7 +93,7 @@ export function AIAssistant() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "Erro de conexão. Tente novamente. 🙏",
+        content: t.assistant.error,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -156,7 +151,7 @@ export function AIAssistant() {
                       <Bot className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-sm">PL Assistente</h3>
+                      <h3 className="font-semibold text-sm">{t.assistant.title}</h3>
                       <p className="text-xs text-white/70 flex items-center gap-1">
                         <span className="w-2 h-2 rounded-full bg-green-400" />
                         Online
@@ -167,14 +162,14 @@ export function AIAssistant() {
                     <button
                       onClick={() => setIsMinimized(true)}
                       className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                      aria-label="Minimizar"
+                      aria-label={t.assistant.minimize}
                     >
                       <Minimize2 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={closeChat}
                       className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
-                      aria-label="Fechar"
+                      aria-label={t.assistant.close}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -188,14 +183,13 @@ export function AIAssistant() {
                       <Sparkles className="h-8 w-8 text-party-blue" />
                     </div>
                     <h4 className="font-semibold text-foreground mb-2">
-                      Olá! Sou o PL Assistente 👋
+                      {t.assistant.welcome}
                     </h4>
                     <p className="text-sm text-muted-foreground mb-6">
-                      Posso ajudar com informações sobre o Partido Liberal,
-                      programa de governo, eventos e muito mais!
+                      {t.assistant.welcomeDesc}
                     </p>
                     <div className="space-y-2">
-                      {quickQuestions.map((q) => (
+                      {t.assistant.questions.map((q) => (
                         <button
                           key={q}
                           onClick={() => sendMessage(q)}
@@ -249,7 +243,7 @@ export function AIAssistant() {
                             <div className="px-4 py-2.5 rounded-2xl bg-gray-100 rounded-tl-none">
                               <div className="flex items-center gap-2 text-muted-foreground">
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                <span className="text-sm">Pensando...</span>
+                                <span className="text-sm">{t.assistant.thinking}</span>
                               </div>
                             </div>
                           </div>
@@ -263,7 +257,7 @@ export function AIAssistant() {
                 {/* Quick Questions (show when chat has messages) */}
                 {messages.length > 0 && !isLoading && (
                   <div className="px-4 pb-2 flex gap-2 overflow-x-auto flex-shrink-0 scrollbar-hide">
-                    {quickQuestions.slice(0, 2).map((q) => (
+                    {t.assistant.questions.slice(0, 2).map((q) => (
                       <button
                         key={q}
                         onClick={() => sendMessage(q)}
@@ -282,7 +276,7 @@ export function AIAssistant() {
                       ref={inputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      placeholder="Faça uma pergunta..."
+                      placeholder={t.assistant.placeholder}
                       disabled={isLoading}
                       className="flex-1"
                     />
@@ -311,7 +305,7 @@ export function AIAssistant() {
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               className="w-14 h-14 rounded-full shadow-lg flex items-center justify-center bg-party-blue hover:bg-party-blue-dark transition-colors relative"
-              aria-label="Abrir assistente"
+              aria-label={t.assistant.openAssistant}
             >
               <Bot className="h-7 w-7 text-white" />
               <span className="absolute -top-1 -right-1 w-4 h-4 bg-party-yellow rounded-full border-2 border-white animate-pulse" />

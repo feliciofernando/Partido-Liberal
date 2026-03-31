@@ -13,131 +13,61 @@ import {
   Briefcase,
   Zap,
   Users,
-  ChevronDown,
 } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
-const programAreas = [
-  {
-    id: "saude",
-    icon: Heart,
-    title: "Saúde",
-    summary: "Investimentos massivos em hospitais, postos de saúde e formação de profissionais.",
-    points: [
-      "Construção de 50 novos hospitais provinciais",
-      "Contratação de 20.000 profissionais de saúde",
-      "Programa de saúde materno-infantil ampliado",
-      "Medicamentos gratuitos para idosos e crianças",
-      "Modernização dos sistemas hospitalares",
-    ],
-  },
-  {
-    id: "educacao",
-    icon: GraduationCap,
-    title: "Educação",
-    summary: "Educação de qualidade para todos, desde o ensino primário até a universidade.",
-    points: [
-      "Escolas gratuitas em todas as comunidades",
-      "Reforma curricular com foco em tecnologia",
-      "Bolsas de estudo para alunos meritórios",
-      "Formação contínua de professores",
-      "Investimento em infraestrutura escolar",
-    ],
-  },
-  {
-    id: "economia",
-    icon: Briefcase,
-    title: "Economia",
-    summary: "Diversificação econômica, apoio ao empreendedorismo e geração de empregos.",
-    points: [
-      "Redução de impostos para pequenas empresas",
-      "Programa de microcrédito acessível",
-      "Incentivo à agricultura familiar",
-      "Criação de zonas económicas especiais",
-      "Parcerias público-privadas estratégicas",
-    ],
-  },
-  {
-    id: "infraestrutura",
-    icon: Building2,
-    title: "Infraestrutura",
-    summary: "Estradas, energia elétrica, água potável e habitação para todos.",
-    points: [
-      "Pavimentação de 5.000 km de estradas",
-      "Eletrificação rural em todas as províncias",
-      "Expansão da rede de abastecimento de água",
-      "Programa de habitação social",
-      "Transporte público moderno e acessível",
-    ],
-  },
-  {
-    id: "ambiente",
-    icon: Leaf,
-    title: "Meio Ambiente",
-    summary: "Desenvolvimento sustentável, proteção ambiental e energias renováveis.",
-    points: [
-      "Investimento em energias renováveis",
-      "Programa de reflorestamento nacional",
-      "Gestão sustentável de recursos naturais",
-      "Saneamento básico universal",
-      "Políticas de combate às mudanças climáticas",
-    ],
-  },
-  {
-    id: "seguranca",
-    icon: Shield,
-    title: "Segurança",
-    summary: "Paz, justiça e proteção para todos os cidadãos angolanos.",
-    points: [
-      "Modernização das forças de segurança",
-      "Combate à corrupção e impunidade",
-      "Reforma do sistema judicial",
-      "Proteção dos direitos humanos",
-      "Programas de prevenção à criminalidade",
-    ],
-  },
-  {
-    id: "juventude",
-    icon: Users,
-    title: "Juventude",
-    summary: "Oportunidades, formação e apoio para os jovens angolanos.",
-    points: [
-      "Programa de emprego jovem",
-      "Centros de formação profissional",
-      "Apoio ao desporto e cultura",
-      "Incentivo ao empreendedorismo juvenil",
-      "Participação ativa na vida cívica",
-    ],
-  },
-  {
-    id: "tecnologia",
-    icon: Zap,
-    title: "Inovação & Tecnologia",
-    summary: "Transformação digital e Angola como hub tecnológico africano.",
-    points: [
-      "Internet de alta velocidade em todo país",
-      "Parques tecnológicos e incubadoras",
-      "Formação em carreiras digitais",
-      "Governo digital e serviços online",
-      "Incentivo a startups tecnológicas",
-    ],
-  },
-];
+// Icon mapping keyed by area id
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  health: Heart,
+  education: GraduationCap,
+  economy: Briefcase,
+  infrastructure: Building2,
+  environment: Leaf,
+  security: Shield,
+  youth: Users,
+  technology: Zap,
+};
+
+// Area keys in display order
+const areaKeys = [
+  "health",
+  "education",
+  "economy",
+  "infrastructure",
+  "environment",
+  "security",
+  "youth",
+  "technology",
+] as const;
 
 export function ProgramSection() {
+  const { t } = useTranslation();
+
+  // Build program areas from translations
+  const programAreas = areaKeys.map((key) => {
+    const area = t.program.areas[key];
+    return {
+      id: key,
+      icon: iconMap[key],
+      title: area.title,
+      summary: area.description,
+      points: area.items,
+    };
+  });
+
   return (
     <section id="programa" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <Badge className="bg-blue-100 text-blue-700 mb-4">
-            Programa de Governo
+            {t.program.badge}
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Nosso <span className="text-party-blue">Plano para Angola</span>
+            {t.program.heading.split(' ').slice(0, -1).join(' ')} <span className="text-party-blue">{t.program.heading.split(' ').slice(-1)}</span>
           </h2>
           <p className="text-lg text-muted-foreground">
-            Um programa de governo interativo. Clique em cada área para conhecer
-            nossas propostas detalhadas para construir um Angola melhor.
+            {t.program.description}
           </p>
         </div>
 
@@ -168,7 +98,7 @@ export function ProgramSection() {
                   <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-muted/50">
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                        <area.icon className="h-5 w-5 text-blue-600" />
+                        <area.icon className="h-5 h-5 text-blue-600" />
                       </div>
                       <div className="text-left">
                         <span className="font-semibold text-foreground">{area.title}</span>
@@ -198,7 +128,7 @@ export function ProgramSection() {
             <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Baixar Programa Completo (PDF)
+            {t.program.downloadPDF}
           </Button>
         </div>
       </div>

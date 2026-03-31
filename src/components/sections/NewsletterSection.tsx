@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Send, Loader2, CheckCircle, Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/lib/i18n";
 
 export function NewsletterSection() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -30,18 +32,18 @@ export function NewsletterSection() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erro ao inscrever");
+        throw new Error(data.error || t.newsletter.errorSubscription);
       }
 
       setIsSuccess(true);
       toast({
-        title: "Inscrição realizada!",
-        description: data.message || "Você receberá nossas novidades em breve.",
+        title: t.newsletter.toast.successTitle,
+        description: data.message || t.newsletter.toast.successDescription,
       });
     } catch (error: any) {
       toast({
-        title: "Erro na inscrição",
-        description: error.message || "Ocorreu um erro. Tente novamente.",
+        title: t.newsletter.toast.errorTitle,
+        description: error.message || t.newsletter.toast.errorDescription,
         variant: "destructive",
       });
     } finally {
@@ -61,25 +63,24 @@ export function NewsletterSection() {
                 Newsletter
               </Badge>
               <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                Receba Nossas Novidades
+                {t.newsletter.heading}
               </h2>
               <p className="text-white/80 mb-6">
-                Inscreva-se para receber atualizações sobre eventos, notícias e
-                comunicados oficiais do Partido Liberal diretamente no seu email.
+                {t.newsletter.description}
               </p>
 
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-white/70" />
-                  <span className="text-sm text-white/90">Alertas de eventos</span>
+                  <span className="text-sm text-white/90">{t.newsletter.features.events}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-white/70" />
-                  <span className="text-sm text-white/90">Notícias exclusivas</span>
+                  <span className="text-sm text-white/90">{t.newsletter.features.news}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-5 w-5 text-white/70" />
-                  <span className="text-sm text-white/90">Comunicados oficiais</span>
+                  <span className="text-sm text-white/90">{t.newsletter.features.official}</span>
                 </div>
               </div>
             </div>
@@ -92,10 +93,10 @@ export function NewsletterSection() {
                     <CheckCircle className="h-8 w-8 text-slate-600" />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    Inscrição Confirmada!
+                    {t.newsletter.successTitle}
                   </h3>
                   <p className="text-muted-foreground mb-4">
-                    Obrigado por se inscrever. Você receberá nossos comunicados em breve.
+                    {t.newsletter.successDescription}
                   </p>
                   <Button
                     onClick={() => {
@@ -104,14 +105,14 @@ export function NewsletterSection() {
                     }}
                     variant="outline"
                   >
-                    Inscrever outro email
+                    {t.newsletter.newEmail}
                   </Button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="w-full space-y-6">
                   <div className="space-y-2">
                     <label htmlFor="newsletter-email" className="text-sm font-medium text-foreground">
-                      Seu melhor email
+                      {t.newsletter.emailLabel}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -129,17 +130,12 @@ export function NewsletterSection() {
 
                   <div className="space-y-4">
                     <label className="text-sm font-medium text-foreground">
-                      Quais informações deseja receber?
+                      {t.newsletter.preferencesLabel}
                     </label>
                     <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { id: "eventos", label: "Eventos" },
-                        { id: "noticias", label: "Notícias" },
-                        { id: "comunicados", label: "Comunicados" },
-                        { id: "campanha", label: "Campanha" },
-                      ].map((item) => (
+                      {t.newsletter.preferences.map((label, index) => (
                         <label
-                          key={item.id}
+                          key={["eventos", "noticias", "comunicados", "campanha"][index]}
                           className="flex items-center gap-2 cursor-pointer"
                         >
                           <input
@@ -147,7 +143,7 @@ export function NewsletterSection() {
                             defaultChecked
                             className="w-4 h-4 text-slate-700 border-slate-300 rounded focus:ring-slate-500"
                           />
-                          <span className="text-sm text-muted-foreground">{item.label}</span>
+                          <span className="text-sm text-muted-foreground">{label}</span>
                         </label>
                       ))}
                     </div>
@@ -161,18 +157,18 @@ export function NewsletterSection() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Inscrevendo...
+                        {t.newsletter.subscribing}
                       </>
                     ) : (
                       <>
                         <Send className="mr-2 h-4 w-4" />
-                        Quero Receber Novidades
+                        {t.newsletter.submit}
                       </>
                     )}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Respeitamos sua privacidade. Você pode cancelar a inscrição a qualquer momento.
+                    {t.newsletter.privacy}
                   </p>
                 </form>
               )}

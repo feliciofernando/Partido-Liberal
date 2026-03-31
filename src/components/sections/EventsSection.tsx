@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Calendar, MapPin, Users, Clock, CheckCircle, Loader2, CalendarDays } from "lucide-react";
+import { useTranslation } from "@/lib/i18n";
 
 interface Event {
   id: string;
@@ -26,22 +27,19 @@ interface Event {
   confirmations: number;
 }
 
-// Helper functions to avoid hydration mismatch
+// Helper function to avoid hydration mismatch
 function formatNumber(num: number): string {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-const MONTHS_PT = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-const MONTHS_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-
-function formatMonth(dateStr: string): string {
+function formatMonth(dateStr: string, monthsShort: string[]): string {
   const date = new Date(dateStr);
-  return MONTHS_SHORT[date.getMonth()];
+  return monthsShort[date.getMonth()];
 }
 
-function formatFullDate(dateStr: string): string {
+function formatFullDate(dateStr: string, months: string[], separator: string): string {
   const date = new Date(dateStr);
-  return `${date.getDate()} de ${MONTHS_PT[date.getMonth()]} de ${date.getFullYear()}`;
+  return `${date.getDate()} ${separator} ${months[date.getMonth()]} ${separator} ${date.getFullYear()}`;
 }
 
 const mockEvents: Event[] = [
@@ -112,20 +110,21 @@ const mockEvents: Event[] = [
   },
 ];
 
-const typeLabels: Record<string, string> = {
-  comicio: "Comício",
-  passeata: "Passeata",
-  encontro: "Encontro",
-  reuniao: "Reunião",
-};
-
 export function EventsSection() {
+  const { t } = useTranslation();
   const [events, setEvents] = useState<Event[]>(mockEvents);
   const [confirmedEvents, setConfirmedEvents] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState<string | null>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
+
+  const typeLabels: Record<string, string> = {
+    comicio: "Comício",
+    passeata: "Passeata",
+    encontro: "Encontro",
+    reuniao: "Reunião",
+  };
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -159,7 +158,7 @@ export function EventsSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           eventId,
-          name: "Apoiante",
+          name: t.events.supporter,
         }),
       });
 
@@ -190,7 +189,7 @@ export function EventsSection() {
     const key = `${date.getFullYear()}-${date.getMonth()}`;
     if (!acc[key]) {
       acc[key] = {
-        label: `${MONTHS_PT[date.getMonth()]} ${date.getFullYear()}`,
+        label: `${t.shared.months[date.getMonth()]} ${date.getFullYear()}`,
         events: []
       };
     }
@@ -205,14 +204,13 @@ export function EventsSection() {
           {/* Section Header */}
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Badge className="bg-blue-100 text-blue-700 mb-4">
-              Agenda
+              {t.events.badge}
             </Badge>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Próximos <span className="text-party-blue">Eventos</span>
+              {t.events.heading.split(' ').slice(0, -1).join(' ')} <span className="text-party-blue">{t.events.heading.split(' ').slice(-1)}</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Participe dos nossos eventos e faça parte da mudança. Confirme sua presença
-              e ajude-nos a construir um Angola melhor.
+              {t.events.description}
             </p>
           </div>
 
@@ -245,7 +243,7 @@ export function EventsSection() {
                           {new Date(event.date).getDate()}
                         </span>
                         <span className="text-xs uppercase">
-                          {formatMonth(event.date)}
+                          {formatMonth(event.date, t.shared.monthsShort)}
                         </span>
                       </div>
                       <div>
@@ -277,7 +275,7 @@ export function EventsSection() {
                       </div>
                       <div className="flex items-center gap-2 text-muted-foreground">
                         <Users className="h-4 w-4 text-slate-500" />
-                        <span>{formatNumber(event.attendees || 0)} participantes esperados</span>
+                        <span>{formatNumber(event.attendees || 0)} {t.events.expectedAttendees}</span>
                       </div>
                     </div>
 
@@ -299,15 +297,15 @@ export function EventsSection() {
                       {confirming === event.id ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Confirmando...
+                          {t.events.confirming}
                         </>
                       ) : confirmedEvents.includes(event.id) ? (
                         <>
                           <CheckCircle className="mr-2 h-4 w-4" />
-                          Presença Confirmada
+                          {t.events.confirmed}
                         </>
                       ) : (
-                        "Confirmar Presença"
+                        t.events.confirmAttendance
                       )}
                     </Button>
                   </CardContent>
@@ -324,19 +322,19 @@ export function EventsSection() {
               onClick={() => setShowCalendar(true)}
             >
               <Calendar className="mr-2 h-4 w-4" />
-              Ver Calendário Completo
+              {t.events.viewCalendar}
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Modal - Calendário Completo */}
+      {/* Modal - Calendar */}
       <Dialog open={showCalendar} onOpenChange={setShowCalendar}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-xl">
               <CalendarDays className="w-5 h-5 text-blue-600" />
-              Calendário Completo de Eventos
+              {t.events.calendarTitle}
             </DialogTitle>
           </DialogHeader>
 
@@ -348,7 +346,7 @@ export function EventsSection() {
               onClick={() => setSelectedProvince(null)}
               className={selectedProvince === null ? "bg-blue-600 hover:bg-blue-700" : ""}
             >
-              Todas as Províncias
+              {t.events.allProvinces}
             </Button>
             {provinces.map((province) => (
               <Button
@@ -368,9 +366,9 @@ export function EventsSection() {
             {Object.keys(groupedEvents).length === 0 ? (
               <div className="text-center py-12">
                 <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Nenhum evento encontrado</h3>
+                <h3 className="font-semibold text-foreground mb-2">{t.events.noEvents}</h3>
                 <p className="text-muted-foreground">
-                  {selectedProvince ? "Tente selecionar outra província." : "Novos eventos serão adicionados em breve."}
+                  {selectedProvince ? t.events.noEventsHint : t.events.noEventsSoon}
                 </p>
               </div>
             ) : (
@@ -393,7 +391,7 @@ export function EventsSection() {
                                 {new Date(event.date).getDate()}
                               </span>
                               <span className="text-xs uppercase">
-                                {formatMonth(event.date)}
+                                {formatMonth(event.date, t.shared.monthsShort)}
                               </span>
                             </div>
                             <div className="flex-1">
@@ -441,7 +439,7 @@ export function EventsSection() {
           {/* Footer */}
           <div className="pt-4 border-t text-center">
             <p className="text-sm text-muted-foreground">
-              {filteredEvents.length} evento(s) encontrado(s)
+              {filteredEvents.length} {t.events.eventCount}
             </p>
           </div>
         </DialogContent>
