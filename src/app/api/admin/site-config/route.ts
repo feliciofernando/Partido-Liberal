@@ -48,7 +48,6 @@ export async function PUT(request: NextRequest) {
       videoUrl: data.videoUrl || null,
       videoTitle: data.videoTitle || null,
       partyDescription: data.partyDescription || null,
-      openrouterApiKey: data.openrouterApiKey || null,
     }
 
     let config
