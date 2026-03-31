@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -103,16 +103,19 @@ model KitItem {
 
 // Voluntarios
 model Volunteer {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  phone     String?
-  province  String?
-  message   String?
-  status    String   @default("pendente")
-  isFiscal  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  province     String?
+  municipality String?
+  availability String?
+  interests    String?  // JSON string or comma-separated
+  experience   String?
+  isFiscal     Boolean  @default(false)
+  status       String   @default("pendente")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("Volunteer")
 }
@@ -121,11 +124,13 @@ model Volunteer {
 model Complaint {
   id        String   @id @default(uuid())
   type      String
-  subject   String?
-  message   String
+  name      String?
   email     String?
   phone     String?
   province  String?
+  subject   String?
+  message   String
+  anonymous Boolean  @default(false)
   status    String   @default("pendente")
   response  String?
   createdAt DateTime @default(now())

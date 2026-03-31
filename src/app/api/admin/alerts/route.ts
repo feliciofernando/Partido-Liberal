@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth } from '@/lib/admin-auth'
-import { v4 as uuidv4 } from 'uuid'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { db } from '@/lib/db'
 
 // GET - Listar alertas
 export async function GET() {
@@ -12,22 +9,12 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Alert?select=*&order=createdAt.desc`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
+    const alerts = await db.alert.findMany({
+      orderBy: { createdAt: 'desc' }
     })
-
-    if (!res.ok) {
-      return NextResponse.json({ alerts: [] })
-    }
-
-    const alerts = await res.json()
     return NextResponse.json({ alerts })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao buscar alertas:', error)
     return NextResponse.json({ alerts: [] })
   }
 }
@@ -40,50 +27,19 @@ export async function POST(request: NextRequest) {
 
   try {
     const data = await request.json()
-
-    if (!data.title?.trim()) {
-      return NextResponse.json({ error: 'Título é obrigatório' }, { status: 400 })
-    }
-
-    // Se está ativando, desativar outros alertas ativos
-    if (data.active === true) {
-      await fetch(`${SUPABASE_URL}/rest/v1/Alert?active=eq.true`, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ active: false }),
-      })
-    }
-
-    const alert = {
-      id: uuidv4(),
-      title: data.title.trim(),
-      message: data.message || '',
-      type: data.type || 'info',
-      active: data.active ?? true,
-    }
-
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Alert?select=*`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify(alert),
+    
+    const alert = await db.alert.create({
+      data: {
+        title: data.title,
+        message: data.message || null,
+        type: data.type || 'info',
+        active: data.active ?? true,
+      }
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao criar alerta' }, { status: 500 })
-    }
-
-    const created = await res.json()
-    return NextResponse.json({ success: true, alert: created[0] || alert })
-  } catch {
+    return NextResponse.json({ success: true, alert })
+  } catch (error) {
+    console.error('Erro ao criar alerta:', error)
     return NextResponse.json({ error: 'Erro ao criar alerta' }, { status: 500 })
   }
 }
@@ -101,46 +57,20 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    // Se está ativando, desativar outros alertas
-    if (data.active === true) {
-      await fetch(`${SUPABASE_URL}/rest/v1/Alert?active=eq.true`, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ active: false }),
-      })
-    }
-
-    const updateData: Record<string, any> = {
-      updatedAt: new Date().toISOString(),
-    }
-
-    if (data.title !== undefined) updateData.title = data.title.trim()
+    const updateData: Record<string, any> = {}
+    if (data.title !== undefined) updateData.title = data.title
     if (data.message !== undefined) updateData.message = data.message
     if (data.type !== undefined) updateData.type = data.type
     if (data.active !== undefined) updateData.active = data.active
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Alert?id=eq.${data.id}&select=*`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify(updateData),
+    const alert = await db.alert.update({
+      where: { id: data.id },
+      data: updateData
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao atualizar alerta' }, { status: 500 })
-    }
-
-    const updated = await res.json()
-    return NextResponse.json({ success: true, alert: updated[0] })
-  } catch {
+    return NextResponse.json({ success: true, alert })
+  } catch (error) {
+    console.error('Erro ao atualizar alerta:', error)
     return NextResponse.json({ error: 'Erro ao atualizar alerta' }, { status: 500 })
   }
 }
@@ -159,20 +89,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Alert?id=eq.${id}`, {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-      },
+    await db.alert.delete({
+      where: { id }
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao apagar alerta' }, { status: 500 })
-    }
-
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao apagar alerta:', error)
     return NextResponse.json({ error: 'Erro ao apagar alerta' }, { status: 500 })
   }
 }

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth } from '@/lib/admin-auth'
-import { v4 as uuidv4 } from 'uuid'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { db } from '@/lib/db'
 
 // GET - Listar kit items
 export async function GET() {
@@ -12,22 +9,12 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/KitItem?select=*&order=createdAt.desc`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
+    const items = await db.kitItem.findMany({
+      orderBy: { createdAt: 'desc' }
     })
-
-    if (!res.ok) {
-      return NextResponse.json({ items: [] })
-    }
-
-    const items = await res.json()
     return NextResponse.json({ items })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao buscar kit items:', error)
     return NextResponse.json({ items: [] })
   }
 }
@@ -40,41 +27,23 @@ export async function POST(request: NextRequest) {
 
   try {
     const data = await request.json()
-
-    if (!data.title?.trim()) {
-      return NextResponse.json({ error: 'Título é obrigatório' }, { status: 400 })
-    }
-
-    const item = {
-      id: uuidv4(),
-      title: data.title.trim(),
-      description: data.description || '',
-      type: data.type || 'documento',
-      fileUrl: data.fileUrl || '',
-      thumbnail: data.thumbnail || null,
-      downloads: 0,
-      active: data.active ?? true,
-    }
-
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/KitItem?select=*`, {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify(item),
+    
+    const item = await db.kitItem.create({
+      data: {
+        title: data.title,
+        description: data.description || null,
+        type: data.type || 'documento',
+        fileUrl: data.fileUrl || null,
+        thumbnail: data.thumbnail || null,
+        downloads: 0,
+        active: data.active ?? true,
+      }
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao criar item' }, { status: 500 })
-    }
-
-    const created = await res.json()
-    return NextResponse.json({ success: true, item: created[0] || item })
-  } catch {
-    return NextResponse.json({ error: 'Erro ao criar item' }, { status: 500 })
+    return NextResponse.json({ success: true, item })
+  } catch (error) {
+    console.error('Erro ao criar kit item:', error)
+    return NextResponse.json({ error: 'Erro ao criar kit item' }, { status: 500 })
   }
 }
 
@@ -91,36 +60,24 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const updateData: Record<string, any> = {
-      updatedAt: new Date().toISOString(),
-    }
-
-    if (data.title !== undefined) updateData.title = data.title.trim()
+    const updateData: Record<string, any> = {}
+    if (data.title !== undefined) updateData.title = data.title
     if (data.description !== undefined) updateData.description = data.description
     if (data.type !== undefined) updateData.type = data.type
     if (data.fileUrl !== undefined) updateData.fileUrl = data.fileUrl
-    if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail || null
+    if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail
+    if (data.downloads !== undefined) updateData.downloads = data.downloads
     if (data.active !== undefined) updateData.active = data.active
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/KitItem?id=eq.${data.id}&select=*`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify(updateData),
+    const item = await db.kitItem.update({
+      where: { id: data.id },
+      data: updateData
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao atualizar item' }, { status: 500 })
-    }
-
-    const updated = await res.json()
-    return NextResponse.json({ success: true, item: updated[0] })
-  } catch {
-    return NextResponse.json({ error: 'Erro ao atualizar item' }, { status: 500 })
+    return NextResponse.json({ success: true, item })
+  } catch (error) {
+    console.error('Erro ao atualizar kit item:', error)
+    return NextResponse.json({ error: 'Erro ao atualizar kit item' }, { status: 500 })
   }
 }
 
@@ -138,20 +95,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/KitItem?id=eq.${id}`, {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-      },
+    await db.kitItem.delete({
+      where: { id }
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao apagar item' }, { status: 500 })
-    }
-
     return NextResponse.json({ success: true })
-  } catch {
-    return NextResponse.json({ error: 'Erro ao apagar item' }, { status: 500 })
+  } catch (error) {
+    console.error('Erro ao apagar kit item:', error)
+    return NextResponse.json({ error: 'Erro ao apagar kit item' }, { status: 500 })
   }
 }

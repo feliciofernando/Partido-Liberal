@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+import { db } from '@/lib/db'
 
 const defaultTimeline = [
   { year: "2010", title: "Fundação", desc: "O Partido Liberal foi fundado por um grupo de cidadãos comprometidos com a mudança." },
@@ -13,31 +11,9 @@ const defaultTimeline = [
 // GET - Buscar configurações do site (público)
 export async function GET() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/SiteConfig?select=*&limit=1`, {
-      headers: {
-        'apikey': ANON_KEY,
-        'Authorization': `Bearer ${ANON_KEY}`,
-      },
-    })
-
-    if (!res.ok) {
-      return NextResponse.json({ 
-        config: getDefaultConfig() 
-      })
-    }
-
-    const data = await res.json()
+    const config = await db.siteConfig.findFirst()
     
-    if (data && data.length > 0) {
-      // Parse timeline if it's a string
-      const config = data[0]
-      if (typeof config.timeline === 'string') {
-        try {
-          config.timeline = JSON.parse(config.timeline)
-        } catch {
-          config.timeline = defaultTimeline
-        }
-      }
+    if (config) {
       return NextResponse.json({ config })
     }
 

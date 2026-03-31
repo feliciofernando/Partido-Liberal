@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth } from '@/lib/admin-auth'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { db } from '@/lib/db'
 
 // GET - Listar configurações
 export async function GET() {
@@ -11,27 +9,10 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/SiteConfig?select=*`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
-    })
-
-    if (!res.ok) {
-      return NextResponse.json({ config: null })
-    }
-
-    const configs = await res.json()
-    // Converter array de configs em objeto
-    const config: Record<string, string> = {}
-    for (const c of configs) {
-      config[c.key] = c.value
-    }
+    const config = await db.siteConfig.findFirst()
     return NextResponse.json({ config })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao buscar configurações:', error)
     return NextResponse.json({ config: null })
   }
 }
@@ -44,27 +25,64 @@ export async function PUT(request: NextRequest) {
 
   try {
     const data = await request.json()
-
-    for (const [key, value] of Object.entries(data)) {
-      // Upsert cada configuração
-      await fetch(`${SUPABASE_URL}/rest/v1/SiteConfig?on_conflict=key`, {
-        method: 'POST',
-        headers: {
-          'apikey': SUPABASE_SERVICE_KEY,
-          'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'resolution=merge-duplicates',
-        },
-        body: JSON.stringify({
-          key,
-          value: String(value),
-          updatedAt: new Date().toISOString(),
-        }),
+    
+    // Verificar se já existe configuração
+    const existing = await db.siteConfig.findFirst()
+    
+    if (existing) {
+      const config = await db.siteConfig.update({
+        where: { id: existing.id },
+        data: {
+          heroImage: data.heroImage,
+          heroBadge: data.heroBadge,
+          heroTitle: data.heroTitle,
+          heroSubtitle: data.heroSubtitle,
+          heroButtonText1: data.heroButtonText1,
+          heroButtonLink1: data.heroButtonLink1,
+          heroButtonText2: data.heroButtonText2,
+          heroButtonLink2: data.heroButtonLink2,
+          stat1Value: data.stat1Value,
+          stat1Label: data.stat1Label,
+          stat2Value: data.stat2Value,
+          stat2Label: data.stat2Label,
+          stat3Value: data.stat3Value,
+          stat3Label: data.stat3Label,
+          stat4Value: data.stat4Value,
+          stat4Label: data.stat4Label,
+          videoUrl: data.videoUrl,
+          videoTitle: data.videoTitle,
+          partyDescription: data.partyDescription,
+        }
       })
+      return NextResponse.json({ success: true, config })
+    } else {
+      const config = await db.siteConfig.create({
+        data: {
+          heroImage: data.heroImage || null,
+          heroBadge: data.heroBadge || null,
+          heroTitle: data.heroTitle || null,
+          heroSubtitle: data.heroSubtitle || null,
+          heroButtonText1: data.heroButtonText1 || null,
+          heroButtonLink1: data.heroButtonLink1 || null,
+          heroButtonText2: data.heroButtonText2 || null,
+          heroButtonLink2: data.heroButtonLink2 || null,
+          stat1Value: data.stat1Value || null,
+          stat1Label: data.stat1Label || null,
+          stat2Value: data.stat2Value || null,
+          stat2Label: data.stat2Label || null,
+          stat3Value: data.stat3Value || null,
+          stat3Label: data.stat3Label || null,
+          stat4Value: data.stat4Value || null,
+          stat4Label: data.stat4Label || null,
+          videoUrl: data.videoUrl || null,
+          videoTitle: data.videoTitle || null,
+          partyDescription: data.partyDescription || null,
+        }
+      })
+      return NextResponse.json({ success: true, config })
     }
-
-    return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao salvar configurações:', error)
     return NextResponse.json({ error: 'Erro ao salvar configurações' }, { status: 500 })
   }
 }

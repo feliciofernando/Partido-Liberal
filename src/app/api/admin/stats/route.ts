@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
-import { checkAuth, supabaseRequest } from '@/lib/supabase-admin'
+import { checkAuth } from '@/lib/admin-auth'
+import { db } from '@/lib/db'
 
 export async function GET() {
   const authError = await checkAuth()
@@ -19,33 +20,34 @@ export async function GET() {
       kitItems,
       alerts
     ] = await Promise.all([
-      supabaseRequest('News', { query: '?select=id' }).catch(() => []),
-      supabaseRequest('Leader', { query: '?select=id' }).catch(() => []),
-      supabaseRequest('Event', { query: '?select=id' }).catch(() => []),
-      supabaseRequest('Volunteer', { query: '?select=id' }).catch(() => []),
-      supabaseRequest('Volunteer', { query: '?select=id&status=eq.pendente' }).catch(() => []),
-      supabaseRequest('Complaint', { query: '?select=id' }).catch(() => []),
-      supabaseRequest('Complaint', { query: '?select=id&status=eq.pendente' }).catch(() => []),
-      supabaseRequest('Subscriber', { query: '?select=id&active=eq.true' }).catch(() => []),
-      supabaseRequest('KitItem', { query: '?select=id&active=eq.true' }).catch(() => []),
-      supabaseRequest('Alert', { query: '?select=id&active=eq.true' }).catch(() => []),
+      db.news.count().catch(() => 0),
+      db.leader.count().catch(() => 0),
+      db.event.count().catch(() => 0),
+      db.volunteer.count().catch(() => 0),
+      db.volunteer.count({ where: { status: 'pendente' } }).catch(() => 0),
+      db.complaint.count().catch(() => 0),
+      db.complaint.count({ where: { status: 'pendente' } }).catch(() => 0),
+      db.subscriber.count({ where: { active: true } }).catch(() => 0),
+      db.kitItem.count({ where: { active: true } }).catch(() => 0),
+      db.alert.count({ where: { active: true } }).catch(() => 0),
     ])
 
     return NextResponse.json({
       stats: {
-        news: news?.length || 0,
-        leaders: leaders?.length || 0,
-        events: events?.length || 0,
-        volunteers: volunteers?.length || 0,
-        pendingVolunteers: pendingVolunteers?.length || 0,
-        complaints: complaints?.length || 0,
-        pendingComplaints: pendingComplaints?.length || 0,
-        subscribers: subscribers?.length || 0,
-        kitItems: kitItems?.length || 0,
-        activeAlerts: alerts?.length || 0,
+        news,
+        leaders,
+        events,
+        volunteers,
+        pendingVolunteers,
+        complaints,
+        pendingComplaints,
+        subscribers,
+        kitItems,
+        activeAlerts: alerts,
       }
     })
   } catch (error: any) {
+    console.error('Erro ao buscar estatísticas:', error)
     return NextResponse.json({
       stats: {
         news: 0, leaders: 0, events: 0, volunteers: 0, pendingVolunteers: 0,

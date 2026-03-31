@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuth } from '@/lib/admin-auth'
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { db } from '@/lib/db'
 
 // GET - Listar voluntários
 export async function GET() {
@@ -11,22 +9,12 @@ export async function GET() {
   }
 
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Volunteer?select=*&order=createdAt.desc`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      cache: 'no-store',
+    const volunteers = await db.volunteer.findMany({
+      orderBy: { createdAt: 'desc' }
     })
-
-    if (!res.ok) {
-      return NextResponse.json({ volunteers: [] })
-    }
-
-    const volunteers = await res.json()
     return NextResponse.json({ volunteers })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao buscar voluntários:', error)
     return NextResponse.json({ volunteers: [] })
   }
 }
@@ -44,31 +32,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const updateData: Record<string, any> = {
-      updatedAt: new Date().toISOString(),
-    }
+    const updateData: Record<string, any> = {}
 
     if (data.status !== undefined) updateData.status = data.status
     if (data.isFiscal !== undefined) updateData.isFiscal = data.isFiscal
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Volunteer?id=eq.${data.id}&select=*`, {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify(updateData),
+    const volunteer = await db.volunteer.update({
+      where: { id: data.id },
+      data: updateData
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao atualizar voluntário' }, { status: 500 })
-    }
-
-    const updated = await res.json()
-    return NextResponse.json({ success: true, volunteer: updated[0] })
-  } catch {
+    return NextResponse.json({ success: true, volunteer })
+  } catch (error) {
+    console.error('Erro ao atualizar voluntário:', error)
     return NextResponse.json({ error: 'Erro ao atualizar voluntário' }, { status: 500 })
   }
 }
@@ -87,20 +63,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/Volunteer?id=eq.${id}`, {
-      method: 'DELETE',
-      headers: {
-        'apikey': SUPABASE_SERVICE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
-      },
+    await db.volunteer.delete({
+      where: { id }
     })
 
-    if (!res.ok) {
-      return NextResponse.json({ error: 'Erro ao apagar voluntário' }, { status: 500 })
-    }
-
     return NextResponse.json({ success: true })
-  } catch {
+  } catch (error) {
+    console.error('Erro ao apagar voluntário:', error)
     return NextResponse.json({ error: 'Erro ao apagar voluntário' }, { status: 500 })
   }
 }
