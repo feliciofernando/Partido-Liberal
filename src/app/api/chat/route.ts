@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { supabasePublicGetOne } from "@/lib/supabase-public";
 
-const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL = "google/gemini-2.0-flash-001";
 
@@ -38,7 +38,6 @@ COMO DEVE SE COMPORTAR:
 - Use emojis ocasionalmente para ser mais amigável
 - Se perguntarem sobre filiamento, explique que podem se voluntariar pelo site
 - Mencione as 18 províncias de Angola quando relevante
-- Links úteis: site partidoliberal.ao, WhatsApp +244 923 456 789
 - Mantenha respostas concisas (2-4 parágrafos no máximo, a menos que pedido detalhe)
 - Nunca critique outros partidos políticos ou candidatos de forma agressiva
 - Nunca invente dados ou estatísticas - use apenas as informações acima`;
@@ -46,11 +45,41 @@ COMO DEVE SE COMPORTAR:
 // Store conversations in memory (session-based)
 const conversations = new Map<string, Array<{ role: string; content: string }>>();
 
+// Cache the API key to avoid fetching from Supabase on every request
+let cachedApiKey: string | null = null;
+let apiKeyCacheTime = 0;
+const API_KEY_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getOpenRouterApiKey(): Promise<string | null> {
+  const now = Date.now();
+  if (cachedApiKey && (now - apiKeyCacheTime) < API_KEY_CACHE_TTL) {
+    return cachedApiKey;
+  }
+
+  try {
+    const config = await supabasePublicGetOne('SiteConfig?select=openrouterApiKey&limit=1');
+    const key = (config as any)?.openrouterApiKey;
+
+    if (key) {
+      cachedApiKey = key;
+      apiKeyCacheTime = now;
+      return key;
+    }
+  } catch (error) {
+    console.error("Erro ao buscar API key do Supabase:", error);
+  }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    if (!OPENROUTER_API_KEY) {
+    // Buscar chave API do Supabase
+    const apiKey = await getOpenRouterApiKey();
+
+    if (!apiKey) {
       return NextResponse.json(
-        { success: false, response: "Assistente indisponível no momento. Configuração pendente. 🔧" },
+        { success: false, response: "Assistente IA indisponível. A chave API não está configurada. Peça ao administrador para configurar no painel." },
         { status: 503 }
       );
     }
@@ -77,7 +106,7 @@ export async function POST(request: NextRequest) {
     // Limit conversation history (keep system prompt + last 10 messages)
     if (history.length > 12) {
       history = [
-        history[0], // Keep system prompt
+        history[0],
         ...history.slice(-10)
       ];
     }
@@ -86,7 +115,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(OPENROUTER_URL, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
         "HTTP-Referer": "https://partido-liberal.vercel.app",
         "X-Title": "PL Assistente - Partido Liberal Angola",
@@ -106,7 +135,7 @@ export async function POST(request: NextRequest) {
       const errorData = await response.text();
       console.error("OpenRouter API error:", response.status, errorData);
       return NextResponse.json(
-        { success: false, response: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente em alguns instantes. 🙏" },
+        { success: false, response: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente. 🙏" },
         { status: 500 }
       );
     }
