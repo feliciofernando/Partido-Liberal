@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL = "google/gemini-2.0-flash-001";
 
 const SYSTEM_PROMPT = `Você é o assistente virtual oficial do Partido Liberal de Angola (PL). Seu nome é "PL Assistente".
 
@@ -32,7 +35,7 @@ COMO DEVE SE COMPORTAR:
 - Para perguntas fora do tema político, redirecione educadamente para o foco do partido
 - Incentive o engajamento: voluntariado, filiação, participação em eventos
 - Forneça informações práticas: como se voluntariar, próximos eventos, contatos
-- Use emojis ocasionalmente para ser mais amigável (Angola usa muito WhatsApp/emojis)
+- Use emojis ocasionalmente para ser mais amigável
 - Se perguntarem sobre filiamento, explique que podem se voluntariar pelo site
 - Mencione as 18 províncias de Angola quando relevante
 - Links úteis: site partidoliberal.ao, WhatsApp +244 923 456 789
@@ -45,6 +48,13 @@ const conversations = new Map<string, Array<{ role: string; content: string }>>(
 
 export async function POST(request: NextRequest) {
   try {
+    if (!OPENROUTER_API_KEY) {
+      return NextResponse.json(
+        { success: false, response: "Assistente indisponível no momento. Configuração pendente. 🔧" },
+        { status: 503 }
+      );
+    }
+
     const { message, sessionId } = await request.json();
 
     if (!message || !message.trim()) {
@@ -58,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     // Get or create conversation history
     let history = conversations.get(sid) || [
-      { role: "assistant", content: SYSTEM_PROMPT }
+      { role: "system", content: SYSTEM_PROMPT }
     ];
 
     // Add user message
@@ -72,19 +82,37 @@ export async function POST(request: NextRequest) {
       ];
     }
 
-    // Call AI using z-ai-web-dev-sdk
-    const zai = await ZAI.create();
-    const completion = await zai.chat.completions.create({
-      messages: history.map((m) => ({
-        role: m.role as "user" | "assistant",
-        content: m.content,
-      })),
-      thinking: { type: "disabled" },
+    // Call OpenRouter API
+    const response = await fetch(OPENROUTER_URL, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://partido-liberal.vercel.app",
+        "X-Title": "PL Assistente - Partido Liberal Angola",
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: history.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        max_tokens: 1024,
+        temperature: 0.7,
+      }),
     });
 
-    const aiResponse =
-      completion.choices[0]?.message?.content ||
-      "Desculpe, não consegui processar sua mensagem. Tente novamente.";
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error("OpenRouter API error:", response.status, errorData);
+      return NextResponse.json(
+        { success: false, response: "Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente em alguns instantes. 🙏" },
+        { status: 500 }
+      );
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices?.[0]?.message?.content || "Desculpe, não consegui processar sua mensagem. Tente novamente.";
 
     // Add AI response to history
     history.push({ role: "assistant", content: aiResponse });
@@ -101,8 +129,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        response:
-          "Desculpe, ocorreu um erro. Por favor, tente novamente em alguns instantes. 🙏",
+        response: "Desculpe, ocorreu um erro. Por favor, tente novamente em alguns instantes. 🙏",
       },
       { status: 500 }
     );
