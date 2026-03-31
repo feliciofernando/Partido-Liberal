@@ -187,3 +187,52 @@ Stage Summary:
 - Supabase connection successful
 - Create, Read, Update, Delete operations all working
 - Stats endpoint showing correct counts
+
+---
+## Task ID: PWA-Setup
+Agent: full-stack-developer
+Task: Configure Progressive Web App (PWA) support
+
+Work Log:
+- Created public/manifest.json with app metadata (name, icons, theme color, display mode)
+- Created public/sw.js service worker with cache strategies:
+  - Cache-first strategy for static assets (CSS, JS, images, fonts)
+  - Network-first strategy for navigation requests (HTML pages)
+  - API/Supabase requests always go through network (no caching)
+  - Automatic cleanup of old caches on activate
+- Updated layout.tsx with PWA meta tags:
+  - manifest link, theme-color, apple-mobile-web-app tags
+  - Service worker registration script via dangerouslySetInnerHTML
+- Manifest references existing party-logo.png as the app icon
+
+Stage Summary:
+- PWA configured with manifest.json, service worker, and meta tags
+- Site is installable as a mobile app (Add to Home Screen)
+- Offline support for static assets with intelligent caching strategies
+- Lint passes with zero errors
+
+---
+Task ID: AI-Assistant
+Agent: full-stack-developer
+Task: Create AI Chatbot Assistant replacing WhatsApp button
+
+Work Log:
+- Created /api/chat route with z-ai-web-dev-sdk backend integration
+- Created AIAssistant.tsx floating chatbot component with Framer Motion animations
+- Configured system prompt with Partido Liberal knowledge base (leaders, program, events, contact info)
+- Added quick question buttons for instant engagement (president, proposals, volunteering, events)
+- Replaced WhatsAppButton with AIAssistant in page.tsx
+- Conversation memory with session-based support (UUID per session, keeps last 10 messages)
+- Mobile responsive chat window (full-width on mobile, 400px on desktop)
+- Smooth open/close/minimize animations with spring physics
+- Loading state with "Pensando..." indicator while AI responds
+- Error handling for connection failures
+- Party color theming (bg-party-blue, bg-party-yellow, text-party-blue)
+
+Stage Summary:
+- AI chatbot fully functional with Partido Liberal knowledge base
+- Floating button with animations replaces WhatsApp button
+- Quick questions for instant engagement
+- Multi-turn conversation support with memory
+- Lint passes with zero errors
+- Dev server compiles successfully

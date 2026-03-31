@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AlertBanner } from "@/components/layout/AlertBanner";
-import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
+import { AIAssistant } from "@/components/layout/AIAssistant";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { PartySection } from "@/components/sections/PartySection";
 import { LeadersSection } from "@/components/sections/LeadersSection";
@@ -33,7 +33,7 @@ export default function Home() {
         <ComplaintsSection />
       </main>
       <Footer />
-      <WhatsAppButton />
+      <AIAssistant />
     </div>
   );
 }
