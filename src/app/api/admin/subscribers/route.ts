@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
+import { checkAuth, supabaseRequest } from '@/lib/supabase-admin'
 
 // GET - Listar subscritores
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const subscribers = await db.subscriber.findMany({
-      orderBy: { createdAt: 'desc' }
+    const subscribers = await supabaseRequest('Subscriber', {
+      query: '?select=*&order=createdAt.desc',
     })
-    return NextResponse.json({ subscribers })
+    return NextResponse.json({ subscribers: subscribers || [] })
   } catch (error) {
     console.error('Erro ao buscar subscritores:', error)
     return NextResponse.json({ subscribers: [] })
@@ -21,9 +19,8 @@ export async function GET() {
 
 // DELETE - Apagar subscritor
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
@@ -33,8 +30,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.subscriber.delete({
-      where: { id }
+    await supabaseRequest('Subscriber', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`,
     })
 
     return NextResponse.json({ success: true })

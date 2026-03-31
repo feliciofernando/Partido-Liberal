@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
+import { checkAuth, supabaseRequest } from '@/lib/supabase-admin'
 
 // GET - Listar denúncias
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const complaints = await db.complaint.findMany({
-      orderBy: { createdAt: 'desc' }
+    const complaints = await supabaseRequest('Complaint', {
+      query: '?select=*&order=createdAt.desc',
     })
-    return NextResponse.json({ complaints })
+    return NextResponse.json({ complaints: complaints || [] })
   } catch (error) {
     console.error('Erro ao buscar denúncias:', error)
     return NextResponse.json({ complaints: [] })
@@ -21,9 +19,8 @@ export async function GET() {
 
 // PUT - Atualizar denúncia (responder)
 export async function PUT(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
@@ -32,16 +29,18 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const updateData: Record<string, any> = {}
+    const updateData: Record<string, unknown> = {}
 
     if (data.status !== undefined) updateData.status = data.status
     if (data.response !== undefined) updateData.response = data.response
 
-    const complaint = await db.complaint.update({
-      where: { id: data.id },
-      data: updateData
+    const result = await supabaseRequest('Complaint', {
+      method: 'PATCH',
+      body: updateData,
+      query: `?id=eq.${data.id}`,
     })
 
+    const complaint = result?.[0] || { ...updateData, id: data.id }
     return NextResponse.json({ success: true, complaint })
   } catch (error) {
     console.error('Erro ao atualizar denúncia:', error)
@@ -51,9 +50,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Apagar denúncia
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
@@ -63,8 +61,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.complaint.delete({
-      where: { id }
+    await supabaseRequest('Complaint', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`,
     })
 
     return NextResponse.json({ success: true })

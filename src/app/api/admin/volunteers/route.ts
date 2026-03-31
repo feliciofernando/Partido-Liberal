@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
+import { checkAuth, supabaseRequest } from '@/lib/supabase-admin'
 
 // GET - Listar voluntários
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const volunteers = await db.volunteer.findMany({
-      orderBy: { createdAt: 'desc' }
+    const volunteers = await supabaseRequest('Volunteer', {
+      query: '?select=*&order=createdAt.desc',
     })
-    return NextResponse.json({ volunteers })
+    return NextResponse.json({ volunteers: volunteers || [] })
   } catch (error) {
     console.error('Erro ao buscar voluntários:', error)
     return NextResponse.json({ volunteers: [] })
@@ -21,9 +19,8 @@ export async function GET() {
 
 // PUT - Atualizar voluntário
 export async function PUT(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
@@ -32,16 +29,18 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const updateData: Record<string, any> = {}
+    const updateData: Record<string, unknown> = {}
 
     if (data.status !== undefined) updateData.status = data.status
     if (data.isFiscal !== undefined) updateData.isFiscal = data.isFiscal
 
-    const volunteer = await db.volunteer.update({
-      where: { id: data.id },
-      data: updateData
+    const result = await supabaseRequest('Volunteer', {
+      method: 'PATCH',
+      body: updateData,
+      query: `?id=eq.${data.id}`,
     })
 
+    const volunteer = result?.[0] || { ...updateData, id: data.id }
     return NextResponse.json({ success: true, volunteer })
   } catch (error) {
     console.error('Erro ao atualizar voluntário:', error)
@@ -51,9 +50,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Apagar voluntário
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
@@ -63,8 +61,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.volunteer.delete({
-      where: { id }
+    await supabaseRequest('Volunteer', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`,
     })
 
     return NextResponse.json({ success: true })

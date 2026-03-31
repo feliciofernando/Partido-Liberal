@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
-import { generateSlug } from '@/lib/supabase-admin'
+import { supabaseRequest, checkAuth, generateSlug } from '@/lib/supabase-admin'
 
 // GET - Listar líderes
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const leaders = await db.leader.findMany({
-      orderBy: { order: 'asc' }
-    })
+    const leaders = await supabaseRequest('Leader', { query: '?select=*&order=order.asc' })
     return NextResponse.json({ leaders })
   } catch (error) {
     console.error('Erro ao buscar líderes:', error)
@@ -22,15 +17,15 @@ export async function GET() {
 
 // POST - Criar líder
 export async function POST(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
-    
-    const leader = await db.leader.create({
-      data: {
+
+    const result = await supabaseRequest('Leader', {
+      method: 'POST',
+      body: {
         name: data.name,
         slug: data.slug || generateSlug(data.name),
         role: data.role,
@@ -47,23 +42,24 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    const leader = result[0]
+
     return NextResponse.json({ success: true, leader })
   } catch (error: any) {
     console.error('Erro ao criar líder:', error)
-    
-    if (error.code === 'P2002') {
+
+    if (error.message?.includes('unique') || error.message?.includes('duplicate')) {
       return NextResponse.json({ error: 'Já existe um líder com este slug' }, { status: 400 })
     }
-    
+
     return NextResponse.json({ error: 'Erro ao criar líder' }, { status: 500 })
   }
 }
 
 // PUT - Atualizar líder
 export async function PUT(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
@@ -73,7 +69,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const updateData: Record<string, any> = {}
-    
+
     if (data.name !== undefined) updateData.name = data.name
     if (data.slug !== undefined) updateData.slug = data.slug
     if (data.role !== undefined) updateData.role = data.role
@@ -88,10 +84,13 @@ export async function PUT(request: NextRequest) {
     if (data.order !== undefined) updateData.order = data.order
     if (data.active !== undefined) updateData.active = data.active
 
-    const leader = await db.leader.update({
-      where: { id: data.id },
-      data: updateData
+    const result = await supabaseRequest('Leader', {
+      method: 'PATCH',
+      query: `?id=eq.${data.id}`,
+      body: updateData
     })
+
+    const leader = result[0]
 
     return NextResponse.json({ success: true, leader })
   } catch (error) {
@@ -102,20 +101,20 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Apagar líder
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
     const id = searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'ID é obrigatório' }, { status: 401 })
+      return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.leader.delete({
-      where: { id }
+    await supabaseRequest('Leader', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`
     })
 
     return NextResponse.json({ success: true })

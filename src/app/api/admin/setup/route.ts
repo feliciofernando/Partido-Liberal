@@ -1,40 +1,42 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { supabaseRequest } from '@/lib/supabase-admin'
 
-// API para verificar o banco de dados
+// API para verificar o banco de dados via Supabase
 export async function GET() {
-  const results: any = {}
+  const results: Record<string, string> = {}
 
   try {
-    // Testar cada tabela
     const tables = [
-      { name: 'news', model: db.news },
-      { name: 'leaders', model: db.leader },
-      { name: 'events', model: db.event },
-      { name: 'volunteers', model: db.volunteer },
-      { name: 'complaints', model: db.complaint },
-      { name: 'programs', model: db.governmentProgram },
-      { name: 'kitItems', model: db.kitItem },
-      { name: 'alerts', model: db.alert },
-      { name: 'subscribers', model: db.subscriber },
+      'News',
+      'Leader',
+      'Event',
+      'Volunteer',
+      'Complaint',
+      'GovernmentProgram',
+      'KitItem',
+      'Alert',
+      'Subscriber',
     ]
 
     for (const table of tables) {
       try {
-        await table.model.findMany({ take: 1 })
-        results[table.name] = '✅ OK'
-      } catch (e: any) {
-        results[table.name] = `❌ ${e.message?.substring(0, 50) || 'Erro'}`
+        await supabaseRequest(table, {
+          query: '?select=id&limit=1',
+        })
+        results[table] = '✅ OK'
+      } catch (e: unknown) {
+        const message = e instanceof Error ? e.message : 'Erro'
+        results[table] = `❌ ${message.substring(0, 50)}`
       }
     }
-
-  } catch (error: any) {
-    results.error = error.message
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido'
+    results.error = message
   }
 
   return NextResponse.json({
-    message: 'Verificação do banco de dados',
+    message: 'Verificação do banco de dados (Supabase)',
     results,
-    instructions: 'Se houver tabelas com erro, execute o SQL no Supabase SQL Editor'
+    instructions: 'Se houver tabelas com erro, execute o SQL no Supabase SQL Editor',
   })
 }

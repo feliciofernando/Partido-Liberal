@@ -901,34 +901,6 @@ function SettingsSection() {
             <Textarea value={config.partyDescription || ''} onChange={(e) => updateConfig('partyDescription', e.target.value)} rows={3} className="mt-1.5" />
           </div>
         </div>
-
-        {/* AI Integration */}
-        <div className="bg-white border border-slate-200 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-            <span className="text-xl">🤖</span>
-            Assistente IA (Chatbot)
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <Label className="text-sm font-medium text-slate-700">Chave API OpenRouter</Label>
-              <Input
-                type="password"
-                value={config.openrouterApiKey || ''}
-                onChange={(e) => updateConfig('openrouterApiKey', e.target.value)}
-                placeholder="sk-or-v1-..."
-                className="mt-1.5 font-mono text-sm"
-              />
-              <p className="text-xs text-slate-500 mt-1.5">
-                Usada para o chatbot IA no site. Obtenha em <span className="text-blue-600">openrouter.ai</span>. Modelo: Gemini 2.0 Flash.
-              </p>
-              {config.openrouterApiKey && (
-                <p className="text-xs text-emerald-600 mt-1 flex items-center gap-1">
-                  <CheckCircleIcon className="w-3 h-3" /> Chave API configurada
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

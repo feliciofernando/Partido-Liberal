@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
-import { generateSlug } from '@/lib/supabase-admin'
+import { supabaseRequest, checkAuth, generateSlug } from '@/lib/supabase-admin'
 
 // GET - Listar eventos
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const events = await db.event.findMany({
-      orderBy: { date: 'desc' }
-    })
+    const events = await supabaseRequest('Event', { query: '?select=*&order=date.desc' })
     return NextResponse.json({ events })
   } catch (error) {
     console.error('Erro ao buscar eventos:', error)
@@ -22,21 +17,21 @@ export async function GET() {
 
 // POST - Criar evento
 export async function POST(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
-    
-    const event = await db.event.create({
-      data: {
+
+    const result = await supabaseRequest('Event', {
+      method: 'POST',
+      body: {
         title: data.title,
         slug: data.slug || generateSlug(data.title),
         description: data.description || null,
         location: data.location || null,
         province: data.province || null,
-        date: new Date(data.date),
+        date: data.date,
         time: data.time || null,
         image: data.image || null,
         type: data.type || 'outro',
@@ -45,23 +40,24 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    const event = result[0]
+
     return NextResponse.json({ success: true, event })
   } catch (error: any) {
     console.error('Erro ao criar evento:', error)
-    
-    if (error.code === 'P2002') {
+
+    if (error.message?.includes('unique') || error.message?.includes('duplicate')) {
       return NextResponse.json({ error: 'Já existe um evento com este slug' }, { status: 400 })
     }
-    
+
     return NextResponse.json({ error: 'Erro ao criar evento' }, { status: 500 })
   }
 }
 
 // PUT - Atualizar evento
 export async function PUT(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
@@ -71,23 +67,26 @@ export async function PUT(request: NextRequest) {
     }
 
     const updateData: Record<string, any> = {}
-    
+
     if (data.title !== undefined) updateData.title = data.title
     if (data.slug !== undefined) updateData.slug = data.slug
     if (data.description !== undefined) updateData.description = data.description
     if (data.location !== undefined) updateData.location = data.location
     if (data.province !== undefined) updateData.province = data.province
-    if (data.date !== undefined) updateData.date = new Date(data.date)
+    if (data.date !== undefined) updateData.date = data.date
     if (data.time !== undefined) updateData.time = data.time
     if (data.image !== undefined) updateData.image = data.image
     if (data.type !== undefined) updateData.type = data.type
     if (data.status !== undefined) updateData.status = data.status
     if (data.attendees !== undefined) updateData.attendees = data.attendees
 
-    const event = await db.event.update({
-      where: { id: data.id },
-      data: updateData
+    const result = await supabaseRequest('Event', {
+      method: 'PATCH',
+      query: `?id=eq.${data.id}`,
+      body: updateData
     })
+
+    const event = result[0]
 
     return NextResponse.json({ success: true, event })
   } catch (error) {
@@ -98,9 +97,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Apagar evento
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
@@ -110,8 +108,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.event.delete({
-      where: { id }
+    await supabaseRequest('Event', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`
     })
 
     return NextResponse.json({ success: true })

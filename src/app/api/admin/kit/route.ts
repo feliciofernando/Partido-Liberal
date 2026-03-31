@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { checkAuth } from '@/lib/admin-auth'
-import { db } from '@/lib/db'
+import { checkAuth, supabaseRequest } from '@/lib/supabase-admin'
 
 // GET - Listar kit items
 export async function GET() {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
-    const items = await db.kitItem.findMany({
-      orderBy: { createdAt: 'desc' }
+    const items = await supabaseRequest('KitItem', {
+      query: '?select=*&order=createdAt.desc',
     })
-    return NextResponse.json({ items })
+    return NextResponse.json({ items: items || [] })
   } catch (error) {
     console.error('Erro ao buscar kit items:', error)
     return NextResponse.json({ items: [] })
@@ -21,25 +19,28 @@ export async function GET() {
 
 // POST - Criar kit item
 export async function POST(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
-    
-    const item = await db.kitItem.create({
-      data: {
-        title: data.title,
-        description: data.description || null,
-        type: data.type || 'documento',
-        fileUrl: data.fileUrl || null,
-        thumbnail: data.thumbnail || null,
-        downloads: 0,
-        active: data.active ?? true,
-      }
+
+    const body = {
+      title: data.title,
+      description: data.description || null,
+      type: data.type || 'documento',
+      fileUrl: data.fileUrl || null,
+      thumbnail: data.thumbnail || null,
+      downloads: 0,
+      active: data.active ?? true,
+    }
+
+    const result = await supabaseRequest('KitItem', {
+      method: 'POST',
+      body,
     })
 
+    const item = result?.[0] || body
     return NextResponse.json({ success: true, item })
   } catch (error) {
     console.error('Erro ao criar kit item:', error)
@@ -49,9 +50,8 @@ export async function POST(request: NextRequest) {
 
 // PUT - Atualizar kit item
 export async function PUT(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const data = await request.json()
@@ -60,7 +60,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    const updateData: Record<string, any> = {}
+    const updateData: Record<string, unknown> = {}
     if (data.title !== undefined) updateData.title = data.title
     if (data.description !== undefined) updateData.description = data.description
     if (data.type !== undefined) updateData.type = data.type
@@ -69,11 +69,13 @@ export async function PUT(request: NextRequest) {
     if (data.downloads !== undefined) updateData.downloads = data.downloads
     if (data.active !== undefined) updateData.active = data.active
 
-    const item = await db.kitItem.update({
-      where: { id: data.id },
-      data: updateData
+    const result = await supabaseRequest('KitItem', {
+      method: 'PATCH',
+      body: updateData,
+      query: `?id=eq.${data.id}`,
     })
 
+    const item = result?.[0] || { ...updateData, id: data.id }
     return NextResponse.json({ success: true, item })
   } catch (error) {
     console.error('Erro ao atualizar kit item:', error)
@@ -83,9 +85,8 @@ export async function PUT(request: NextRequest) {
 
 // DELETE - Apagar kit item
 export async function DELETE(request: NextRequest) {
-  if (!await checkAuth()) {
-    return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
-  }
+  const authError = await checkAuth()
+  if (authError) return authError
 
   try {
     const { searchParams } = new URL(request.url)
@@ -95,8 +96,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID é obrigatório' }, { status: 400 })
     }
 
-    await db.kitItem.delete({
-      where: { id }
+    await supabaseRequest('KitItem', {
+      method: 'DELETE',
+      query: `?id=eq.${id}`,
     })
 
     return NextResponse.json({ success: true })
