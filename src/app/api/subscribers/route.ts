@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseHeaders, supabasePublicQuery } from '@/lib/supabase-public'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
 // GET - Get subscriber count
 export async function GET() {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     const headers = {
-      'apikey': anonKey,
-      'Authorization': `Bearer ${anonKey}`,
+      ...getSupabaseHeaders(),
       'Prefer': 'count=exact',
     }
 
-    const res = await fetch(`${supabaseUrl}/rest/v1/Subscriber?select=id`, { headers })
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Subscriber?select=id`, { headers })
     const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0')
 
     return NextResponse.json({ count })
@@ -31,17 +31,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    const headers: Record<string, string> = {
-      'apikey': anonKey,
-      'Authorization': `Bearer ${anonKey}`,
-      'Content-Type': 'application/json',
+    const headers = {
+      ...getSupabaseHeaders(),
       'Prefer': 'return=representation',
     }
 
     // Check if email already exists
-    const checkRes = await fetch(`${supabaseUrl}/rest/v1/Subscriber?email=eq.${encodeURIComponent(body.email)}&select=id,active`, { headers })
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/Subscriber?email=eq.${encodeURIComponent(body.email)}&select=id,active`, { headers })
 
     if (checkRes.ok) {
       const existing = await checkRes.json()
@@ -53,9 +49,9 @@ export async function POST(request: NextRequest) {
           })
         } else {
           // Reactivate subscription
-          await fetch(`${supabaseUrl}/rest/v1/Subscriber?id=eq.${existing[0].id}`, {
+          await fetch(`${SUPABASE_URL}/rest/v1/Subscriber?id=eq.${existing[0].id}`, {
             method: 'PATCH',
-            headers: { ...headers, 'Prefer': 'return=minimal' },
+            headers: { ...getSupabaseHeaders(), 'Prefer': 'return=minimal' },
             body: JSON.stringify({ active: true }),
           })
           return NextResponse.json({
@@ -67,7 +63,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new subscriber
-    const res = await fetch(`${supabaseUrl}/rest/v1/Subscriber`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Subscriber`, {
       method: 'POST',
       headers,
       body: JSON.stringify({

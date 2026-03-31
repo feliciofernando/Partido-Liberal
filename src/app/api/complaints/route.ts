@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseHeaders, supabasePublicQuery } from '@/lib/supabase-public'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
 // GET - Get complaint count
 export async function GET() {
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     const headers = {
-      'apikey': anonKey,
-      'Authorization': `Bearer ${anonKey}`,
+      ...getSupabaseHeaders(),
       'Prefer': 'count=exact',
     }
 
-    const res = await fetch(`${supabaseUrl}/rest/v1/Complaint?select=id`, { headers })
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Complaint?select=id`, { headers })
     const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0')
 
     return NextResponse.json({ count })
@@ -36,16 +36,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Mensagem é obrigatória' }, { status: 400 })
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    const headers: Record<string, string> = {
-      'apikey': anonKey,
-      'Authorization': `Bearer ${anonKey}`,
-      'Content-Type': 'application/json',
+    const headers = {
+      ...getSupabaseHeaders(),
       'Prefer': 'return=representation',
     }
 
-    const res = await fetch(`${supabaseUrl}/rest/v1/Complaint`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/Complaint`, {
       method: 'POST',
       headers,
       body: JSON.stringify({

@@ -1,6 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { NewsDetailClient } from "./NewsDetailClient";
+import { getSupabaseHeaders } from "@/lib/supabase-public";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 // Fallback data
 const mockNews = [
@@ -95,12 +98,9 @@ const mockNews = [
 async function getNewsBySlug(slug: string) {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/News?slug=eq.${slug}&published=eq.true&select=*`,
+      `${SUPABASE_URL}/rest/v1/News?slug=eq.${slug}&published=eq.true&select=*`,
       {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        },
+        headers: getSupabaseHeaders(),
         cache: "no-store",
       }
     );
@@ -122,12 +122,9 @@ async function getNewsBySlug(slug: string) {
 async function getAllNews() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/News?published=eq.true&select=*&order=createdAt.desc&limit=10`,
+      `${SUPABASE_URL}/rest/v1/News?published=eq.true&select=*&order=createdAt.desc&limit=10`,
       {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        },
+        headers: getSupabaseHeaders(),
         cache: "no-store",
       }
     );
@@ -150,12 +147,9 @@ async function getUpcomingEvents() {
   try {
     const today = new Date().toISOString().split('T')[0];
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/Event?date=gte.${today}&select=*&order=date.asc&limit=3`,
+      `${SUPABASE_URL}/rest/v1/Event?date=gte.${today}&select=*&order=date.asc&limit=3`,
       {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        },
+        headers: getSupabaseHeaders(),
         cache: "no-store",
       }
     );
@@ -177,12 +171,9 @@ async function getUpcomingEvents() {
 async function getLeaders() {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/Leader?select=*&limit=3`,
+      `${SUPABASE_URL}/rest/v1/Leader?select=*&limit=3`,
       {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        },
+        headers: getSupabaseHeaders(),
         cache: "no-store",
       }
     );

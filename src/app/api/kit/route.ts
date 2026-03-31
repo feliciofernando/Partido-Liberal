@@ -1,15 +1,11 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { supabasePublicQuery } from '@/lib/supabase-public'
 
 // GET - Listar kit items públicos
 export async function GET() {
   try {
-    const items = await db.kitItem.findMany({
-      where: { active: true },
-      orderBy: { createdAt: 'desc' }
-    })
-
-    return NextResponse.json({ items })
+    const data = await supabasePublicQuery('KitItem?active=eq.true&select=*&order=createdAt.desc')
+    return NextResponse.json({ items: data || [] })
   } catch (error) {
     console.error('Erro ao buscar kit items:', error)
     return NextResponse.json({ items: [] })

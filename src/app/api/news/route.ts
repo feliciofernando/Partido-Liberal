@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { supabasePublicQuery, supabasePublicGetOne, supabasePublicPatch } from '@/lib/supabase-public'
 
-// GET - List public news
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -9,33 +8,18 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
 
     if (slug) {
-      // Buscar notícia específica por slug
-      const news = await db.news.findFirst({
-        where: { slug, published: true }
-      })
-
-      if (news) {
-        // Incrementar views
-        await db.news.update({
-          where: { id: news.id },
-          data: { views: news.views + 1 }
-        })
+      const data = await supabasePublicQuery(`News?slug=eq.${slug}&published=eq.true&select=*`)
+      if (data && data.length > 0) {
+        // Increment views
+        await supabasePublicPatch('News', data[0].id, { views: (data[0].views || 0) + 1 })
+        return NextResponse.json({ news: data[0] })
       }
-
-      return NextResponse.json({ news })
+      return NextResponse.json({ news: null })
     }
 
-    // Listar todas as notícias publicadas, ordenando featured primeiro
-    const news = await db.news.findMany({
-      where: { published: true },
-      orderBy: [
-        { featured: 'desc' },
-        { createdAt: 'desc' }
-      ],
-      take: limit,
-    })
-
-    return NextResponse.json({ news })
+    // List published news
+    const data = await supabasePublicQuery(`News?published=eq.true&select=*&order=featured.desc,createdAt.desc&limit=${limit}`)
+    return NextResponse.json({ news: data || [] })
   } catch (error) {
     console.error('Erro ao buscar notícias:', error)
     return NextResponse.json({ news: [] })

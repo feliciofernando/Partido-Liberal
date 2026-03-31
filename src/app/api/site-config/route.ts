@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { supabasePublicGetOne } from '@/lib/supabase-public'
 
 const defaultTimeline = [
   { year: "2010", title: "Fundação", desc: "O Partido Liberal foi fundado por um grupo de cidadãos comprometidos com a mudança." },
@@ -7,22 +7,6 @@ const defaultTimeline = [
   { year: "2020", title: "Crescimento Expressivo", desc: "Triplicamos o número de membros e apoiantes." },
   { year: "2025", title: "Presente", desc: "Preparados para as eleições com propostas inovadoras." },
 ]
-
-// GET - Buscar configurações do site (público)
-export async function GET() {
-  try {
-    const config = await db.siteConfig.findFirst()
-    
-    if (config) {
-      return NextResponse.json({ config })
-    }
-
-    return NextResponse.json({ config: getDefaultConfig() })
-  } catch (error) {
-    console.error('Error fetching site config:', error)
-    return NextResponse.json({ config: getDefaultConfig() })
-  }
-}
 
 function getDefaultConfig() {
   return {
@@ -48,5 +32,18 @@ function getDefaultConfig() {
     partyTitle: 'Conheça o Partido Liberal',
     partySubtitle: 'O Partido',
     timeline: defaultTimeline
+  }
+}
+
+export async function GET() {
+  try {
+    const config = await supabasePublicGetOne('SiteConfig?select=*&limit=1')
+    if (config) {
+      return NextResponse.json({ config: { ...getDefaultConfig(), ...config } })
+    }
+    return NextResponse.json({ config: getDefaultConfig() })
+  } catch (error) {
+    console.error('Error fetching site config:', error)
+    return NextResponse.json({ config: getDefaultConfig() })
   }
 }

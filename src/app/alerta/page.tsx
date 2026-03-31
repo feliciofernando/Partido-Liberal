@@ -1,8 +1,10 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { createClient } from "@/lib/supabase/server";
+import { getSupabaseHeaders } from "@/lib/supabase-public";
 import { BellAlertIcon, CalendarDaysIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 // Fallback data when database is empty
 const defaultAlert = {
@@ -15,22 +17,21 @@ const defaultAlert = {
 };
 
 export default async function AlertaPage() {
-  const supabase = await createClient();
-  
   let alert = defaultAlert;
-  
-  try {
-    if (supabase) {
-      const { data, error } = await supabase
-        .from('Alert')
-        .select('*')
-        .eq('active', true)
-        .order('createdAt', { ascending: false })
-        .limit(1)
-        .single();
 
-      if (!error && data) {
-        alert = data;
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/Alert?active=eq.true&select=*&order=createdAt.desc&limit=1`,
+      {
+        headers: getSupabaseHeaders(),
+        cache: "no-store",
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data && data.length > 0) {
+        alert = data[0];
       }
     }
   } catch (e) {
