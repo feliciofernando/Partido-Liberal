@@ -71,7 +71,7 @@ const mockNews: NewsItem[] = [
     content: '<p>Mais de 10 mil pessoas participaram do comício do Partido Liberal em Saurimo.</p>',
     image: null,
     category: 'imprensa',
-    featured: true,
+    featured: false,
     published: true,
     author: 'Nossa Equipe',
     views: 892,
@@ -154,6 +154,15 @@ export default function NoticiasPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  // Ordenar notícias: featured primeiro, depois por data
+  const sortNews = (newsList: NewsItem[]) => {
+    return [...newsList].sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  };
+
   useEffect(() => {
     async function fetchNews() {
       try {
@@ -161,7 +170,7 @@ export default function NoticiasPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.news && data.news.length > 0) {
-            setNews(data.news);
+            setNews(sortNews(data.news));
             setLoading(false);
             return;
           }
@@ -169,7 +178,7 @@ export default function NoticiasPage() {
       } catch (error) {
         console.log("Error fetching news");
       }
-      setNews(mockNews);
+      setNews(sortNews(mockNews));
       setLoading(false);
     }
     fetchNews();
@@ -178,9 +187,9 @@ export default function NoticiasPage() {
   // Get unique categories from news
   const categories = [...new Set(news.map((n) => n.category))];
   
-  // Filter news by category
+  // Filter news by category (mantendo ordem featured primeiro)
   const filteredNews = selectedCategory 
-    ? news.filter((n) => n.category === selectedCategory)
+    ? sortNews(news.filter((n) => n.category === selectedCategory))
     : news;
 
   // Calculate stats
@@ -297,14 +306,16 @@ export default function NoticiasPage() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded text-xs font-medium bg-white/95 text-slate-700">
-                      {categoryLabels[item.category] || item.category}
-                    </span>
-                    {item.featured && (
-                      <span className="absolute top-3 right-3 px-2.5 py-1 rounded text-xs font-medium bg-amber-500 text-white">
-                        Destaque
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      {item.featured && (
+                        <span className="px-2 py-1 rounded text-xs font-bold bg-amber-500 text-white animate-pulse">
+                          Destacada
+                        </span>
+                      )}
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-white/90 text-blue-700">
+                        {categoryLabels[item.category] || item.category}
                       </span>
-                    )}
+                    </div>
                   </div>
                   <CardContent className="p-5">
                     <h3 className="text-base font-semibold text-foreground group-hover:text-slate-700 transition-colors mb-2 line-clamp-2">

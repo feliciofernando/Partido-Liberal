@@ -44,7 +44,7 @@ const mockNews: News[] = [
     content: '<p>Mais de 10 mil pessoas participaram do comício.</p>',
     image: null,
     category: 'imprensa',
-    featured: true,
+    featured: false,
     published: true,
     author: 'Nossa Equipe',
     views: 892,
@@ -58,7 +58,7 @@ const mockNews: News[] = [
     content: '<p>O Partido Liberal condena veementemente todos os atos de violência.</p>',
     image: null,
     category: 'nota_oficial',
-    featured: true,
+    featured: false,
     published: true,
     author: 'Secretaria-Geral',
     views: 654,
@@ -131,16 +131,28 @@ export function NewsSection() {
   const [news, setNews] = useState<News[]>(mockNews);
   const [loading, setLoading] = useState(true);
 
+  // Ordenar notícias: featured primeiro, depois por data
+  const sortNews = (newsList: News[]) => {
+    return [...newsList].sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  };
+
   useEffect(() => {
     const fetchNews = async () => {
       try {
         const response = await fetch("/api/news");
         const data = await response.json();
         if (data.news && data.news.length > 0) {
-          setNews(data.news);
+          setNews(sortNews(data.news));
+        } else {
+          setNews(sortNews(mockNews));
         }
       } catch (error) {
         console.log("Using mock news data");
+        setNews(sortNews(mockNews));
       } finally {
         setLoading(false);
       }
@@ -190,9 +202,16 @@ export function NewsSection() {
                       <div className="w-full h-full bg-blue-gradient" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                    <span className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
-                      {categoryLabels[item.category] || item.category}
-                    </span>
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      {item.featured && (
+                        <span className="px-2 py-1 rounded-full text-xs font-bold bg-amber-500 text-white animate-pulse">
+                          Destacada
+                        </span>
+                      )}
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/90 text-blue-700">
+                        {categoryLabels[item.category] || item.category}
+                      </span>
+                    </div>
                   </div>
                   <CardContent className="p-4 flex flex-col flex-grow">
                     <h3 className="text-lg font-semibold text-foreground group-hover:text-party-blue transition-colors mb-2 line-clamp-2">

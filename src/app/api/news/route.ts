@@ -50,9 +50,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ news })
     }
 
-    // Listar todas as notícias publicadas
+    // Listar todas as notícias publicadas, ordenando featured primeiro
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/News?published=eq.true&select=*&order=createdAt.desc&limit=${limit}`,
+      `${SUPABASE_URL}/rest/v1/News?published=eq.true&select=*&order=featured.desc,createdAt.desc&limit=${limit}`,
       {
         headers: {
           'apikey': SUPABASE_ANON_KEY,
