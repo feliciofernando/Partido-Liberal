@@ -28,12 +28,80 @@ interface KitItem {
   active: boolean;
 }
 
+// Mock data para quando não houver dados no Supabase
+const mockKitItems: KitItem[] = [
+  {
+    id: '1',
+    title: 'Banner Campanha 2025',
+    description: 'Banner oficial para divulgação em redes sociais e materiais impressos.',
+    type: 'banner',
+    fileUrl: '#',
+    thumbnail: '/images/kit/banner-campanha.png',
+    downloads: 1250,
+    active: true,
+  },
+  {
+    id: '2',
+    title: 'Avatar de Perfil Oficial',
+    description: 'Moldura circular para foto de perfil nas redes sociais.',
+    type: 'avatar',
+    fileUrl: '#',
+    thumbnail: '/images/kit/avatar-perfil.png',
+    downloads: 3420,
+    active: true,
+  },
+  {
+    id: '3',
+    title: 'Flyer Comício Regional',
+    description: 'Panfleto para divulgação de eventos e comícios. Pronto para impressão.',
+    type: 'flyer',
+    fileUrl: '#',
+    thumbnail: '/images/kit/flyer-evento.png',
+    downloads: 890,
+    active: true,
+  },
+  {
+    id: '4',
+    title: 'Stickers WhatsApp',
+    description: 'Pacote de stickers para WhatsApp com mensagens de apoio.',
+    type: 'sticker',
+    fileUrl: '#',
+    thumbnail: '/images/kit/sticker-whatsapp.png',
+    downloads: 5670,
+    active: true,
+  },
+  {
+    id: '5',
+    title: 'Documento Programa de Governo',
+    description: 'Documento oficial com o programa de governo completo.',
+    type: 'documento',
+    fileUrl: '#',
+    thumbnail: '/images/kit/documento-oficial.png',
+    downloads: 2150,
+    active: true,
+  },
+  {
+    id: '6',
+    title: 'Banner Redes Sociais',
+    description: 'Banner quadrado otimizado para Instagram e Facebook.',
+    type: 'banner',
+    fileUrl: '#',
+    thumbnail: '/images/kit/banner-social.png',
+    downloads: 1890,
+    active: true,
+  },
+];
+
 const typeIcons: Record<string, any> = {
   avatar: Image,
   sticker: Smartphone,
   banner: FileImage,
   flyer: FileImage,
   documento: FileText,
+  imagem: Image,
+  video: FileImage,
+  audio: FileImage,
+  apresentacao: FileText,
 };
 
 const typeLabels: Record<string, string> = {
@@ -42,6 +110,10 @@ const typeLabels: Record<string, string> = {
   banner: "Banner",
   flyer: "Flyer",
   documento: "Documento",
+  imagem: "Imagem",
+  video: "Vídeo",
+  audio: "Áudio",
+  apresentacao: "Apresentação",
 };
 
 export function KitSection() {
@@ -55,9 +127,13 @@ export function KitSection() {
         const data = await response.json();
         if (data.items && data.items.length > 0) {
           setKitItems(data.items.filter((item: KitItem) => item.active));
+        } else {
+          // Usar dados de exemplo se não houver dados
+          setKitItems(mockKitItems);
         }
       } catch (error) {
         console.error("Erro ao carregar kit items:", error);
+        setKitItems(mockKitItems);
       } finally {
         setLoading(false);
       }
