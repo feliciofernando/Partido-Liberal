@@ -275,3 +275,79 @@ Work Log:
 
 Stage Summary:
 - Events, Leaders, Program sections now use useTranslation() from @/lib/i18n
+
+---
+## Task ID: 9-a
+Agent: api-rewrite-public
+Task: Rewrite 4 public API routes to use Supabase REST API
+
+Work Log:
+- Rewrote /api/news/route.ts to use Supabase REST API
+- Rewrote /api/leaders/route.ts to use Supabase REST API
+- Rewrote /api/events/route.ts to use Supabase REST API
+- Rewrote /api/site-config/route.ts to use Supabase REST API
+
+Stage Summary:
+- All public API routes now read from Supabase (same as admin/posts and noticia page)
+- No more data source split between SQLite and Supabase
+- Public site will now show images and videos stored in Supabase
+
+---
+## Task ID: supabase-rewrite-5
+Agent: Main Agent
+Task: Rewrite 5 more admin API routes + setup to use Supabase REST API
+
+Work Log:
+- Read all 6 target files and the supabase-admin helper to understand the pattern
+- Rewrote `/api/admin/kit/route.ts` — replaced `db` (Prisma) with `supabaseRequest('KitItem')` for GET/POST/PUT/DELETE; auth via `checkAuth()` from `@/lib/supabase-admin`
+- Rewrote `/api/admin/alerts/route.ts` — replaced `db` (Prisma) with `supabaseRequest('Alert')` for GET/POST/PUT/DELETE
+- Rewrote `/api/admin/volunteers/route.ts` — replaced `db` (Prisma) with `supabaseRequest('Volunteer')` for GET/PUT/DELETE
+- Rewrote `/api/admin/complaints/route.ts` — replaced `db` (Prisma) with `supabaseRequest('Complaint')` for GET/PUT/DELETE
+- Rewrote `/api/admin/subscribers/route.ts` — replaced `db` (Prisma) with `supabaseRequest('Subscriber')` for GET/DELETE
+- Rewrote `/api/admin/setup/route.ts` — replaced Prisma model checks with Supabase HEAD-like queries (`?select=id&limit=1`) for all 9 tables
+
+Key changes across all files:
+- Removed `import { checkAuth } from '@/lib/admin-auth'` → now uses `checkAuth` from `@/lib/supabase-admin`
+- Removed `import { db } from '@/lib/db'` → now uses `supabaseRequest` from `@/lib/supabase-admin`
+- PATCH uses `?id=eq.${id}` query pattern; POST uses `Prefer: return=representation` via helper
+- Single record results extracted with `result?.[0]`
+- All existing functionality preserved (same response shapes, error codes, log messages)
+- `lint` passed with zero errors
+
+Stage Summary:
+- 6 admin API routes now use Supabase REST API exclusively (no Prisma/SQLite)
+- All CRUD operations preserved: KitItem, Alert, Volunteer, Complaint, Subscriber
+- Setup route checks all 9 Supabase tables
+- Lint clean — zero errors
+
+---
+Task ID: bugfix-api-routes
+Agent: Main Agent
+Task: Fix API route bugs - table names, REST paths, SQLite dependency, image rendering
+
+Work Log:
+- Analyzed all public API routes vs admin API routes to identify mismatches
+- Found that most routes were already using Supabase (previous analysis was incorrect)
+- Fixed Events table name: `Events` (plural) → `Event` (singular) in /api/events/route.ts
+- Fixed Events table name in noticia/[slug]/page.tsx (same issue)
+- Fixed volunteers route: REST paths missing `/v1/` prefix (3 occurrences)
+- Fixed complaints route: REST paths missing `/v1/` prefix (2 occurrences)
+- Rewrote subscribers route: converted from SQLite (Prisma/db) to Supabase REST API
+- Fixed pre-existing syntax error in volunteers route (missing closing parenthesis on line 20)
+- Replaced next/image with plain img tag in HeroSection for better Supabase storage URL compatibility
+- Removed unused Image import from HeroSection
+
+Files modified:
+1. src/app/api/events/route.ts - Events → Event table name fix
+2. src/app/api/volunteers/route.ts - Added /v1/ to REST paths + fixed syntax error
+3. src/app/api/complaints/route.ts - Added /v1/ to REST paths
+4. src/app/api/subscribers/route.ts - Complete rewrite from SQLite to Supabase
+5. src/app/noticia/[slug]/page.tsx - Events → Event table name fix
+6. src/components/sections/HeroSection.tsx - Replaced next/image with img for external URLs
+
+Stage Summary:
+- All public API routes now consistently use Supabase REST API with correct table names
+- All REST paths use proper /rest/v1/ prefix
+- No more SQLite/Prisma dependency in public routes
+- Images from Supabase Storage will render correctly with plain img tags
+- ESLint passes with zero errors

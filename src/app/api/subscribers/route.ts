@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-// Dynamic import to avoid build-time issues
-async function getDb() {
-  const { db } = await import('@/lib/db')
-  return db
-}
-
 // GET - Get subscriber count
 export async function GET() {
   try {
-    const db = await getDb()
-    const count = await db.subscriber.count({
-      where: { active: true }
-    })
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const headers = {
+      'apikey': anonKey,
+      'Authorization': `Bearer ${anonKey}`,
+      'Prefer': 'count=exact',
+    }
+
+    const res = await fetch(`${supabaseUrl}/rest/v1/Subscriber?select=id`, { headers })
+    const count = parseInt(res.headers.get('content-range')?.split('/')[1] || '0')
+
     return NextResponse.json({ count })
   } catch (error) {
     console.error('Erro ao buscar inscritos:', error)
@@ -26,65 +27,86 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     console.log('Newsletter signup request:', body)
 
-    // Validate email
     if (!body.email) {
       return NextResponse.json({ error: 'Email é obrigatório' }, { status: 400 })
     }
 
-    const db = await getDb()
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const headers: Record<string, string> = {
+      'apikey': anonKey,
+      'Authorization': `Bearer ${anonKey}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+    }
 
     // Check if email already exists
-    const existing = await db.subscriber.findUnique({
-      where: { email: body.email }
-    })
+    const checkRes = await fetch(`${supabaseUrl}/rest/v1/Subscriber?email=eq.${encodeURIComponent(body.email)}&select=id,active`, { headers })
 
-    if (existing) {
-      if (existing.active) {
-        return NextResponse.json({ 
-          success: true, 
-          message: 'Este email já está inscrito na nossa newsletter!' 
-        })
-      } else {
-        // Reactivate subscription
-        await db.subscriber.update({
-          where: { email: body.email },
-          data: { active: true }
-        })
-        return NextResponse.json({ 
-          success: true, 
-          message: 'Sua inscrição foi reativada com sucesso!' 
-        })
+    if (checkRes.ok) {
+      const existing = await checkRes.json()
+      if (existing && existing.length > 0) {
+        if (existing[0].active) {
+          return NextResponse.json({
+            success: true,
+            message: 'Este email já está inscrito na nossa newsletter!'
+          })
+        } else {
+          // Reactivate subscription
+          await fetch(`${supabaseUrl}/rest/v1/Subscriber?id=eq.${existing[0].id}`, {
+            method: 'PATCH',
+            headers: { ...headers, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ active: true }),
+          })
+          return NextResponse.json({
+            success: true,
+            message: 'Sua inscrição foi reativada com sucesso!'
+          })
+        }
       }
     }
 
-    const subscriber = await db.subscriber.create({
-      data: {
+    // Create new subscriber
+    const res = await fetch(`${supabaseUrl}/rest/v1/Subscriber`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
         email: body.email,
         name: body.name || null,
         active: true,
-      }
+      }),
     })
 
-    console.log('Subscriber created:', subscriber)
+    if (!res.ok) {
+      const errorText = await res.text()
+      console.error('Erro ao inscrever:', errorText)
 
-    return NextResponse.json({ 
-      success: true, 
-      subscriber,
+      if (errorText.includes('unique') || errorText.includes('duplicate') || res.status === 409) {
+        return NextResponse.json({
+          success: true,
+          message: 'Este email já está inscrito na nossa newsletter!'
+        })
+      }
+
+      return NextResponse.json({
+        error: 'Erro ao realizar inscrição. Tente novamente.'
+      }, { status: 500 })
+    }
+
+    const created = await res.json()
+    console.log('Subscriber created:', created)
+
+    return NextResponse.json({
+      success: true,
+      subscriber: created[0] || created,
       message: 'Inscrição realizada com sucesso! Você receberá nossas novidades em breve.'
     })
   } catch (error: any) {
     console.error('Erro ao inscrever:', error)
-    
-    if (error.code === 'P2002') {
-      return NextResponse.json({ 
-        success: true,
-        message: 'Este email já está inscrito na nossa newsletter!' 
-      })
-    }
-    
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       error: 'Erro ao realizar inscrição. Tente novamente.',
-      details: error.message 
+      details: error.message
     }, { status: 500 })
   }
 }

@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Megaphone } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useTranslation } from "@/lib/i18n";
 
@@ -77,12 +76,10 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0">
         {config.heroImage ? (
-          <Image
+          <img
             src={config.heroImage}
             alt={t.hero.imageAlt}
-            fill
-            className="object-cover"
-            priority
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-party-blue via-party-blue-dark to-party-blue" />

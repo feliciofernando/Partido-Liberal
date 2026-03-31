@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/db'
 
-// GET - List public events
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const upcoming = searchParams.get('upcoming')
 
-    const where: any = {}
-    
-    if (upcoming === 'true') {
-      where.date = { gte: new Date() }
-      where.status = { not: 'cancelado' }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    const headers = {
+      'apikey': anonKey,
+      'Authorization': `Bearer ${anonKey}`,
     }
 
-    const events = await db.event.findMany({
-      where,
-      orderBy: { date: 'asc' },
-      take: 10,
+    let query = 'select=*&order=date.asc&limit=10'
+    if (upcoming === 'true') {
+      query = 'date=gte.' + new Date().toISOString().split('T')[0] + '&status=neq.cancelado&select=*&order=date.asc&limit=10'
+    }
+
+    const res = await fetch(`${supabaseUrl}/rest/v1/Event?${query}`, {
+      headers,
+      cache: 'no-store',
     })
 
-    return NextResponse.json({ events })
+    if (res.ok) {
+      const data = await res.json()
+      return NextResponse.json({ events: data || [] })
+    }
+    return NextResponse.json({ events: [] })
   } catch (error) {
     console.error('Erro ao buscar eventos:', error)
     return NextResponse.json({ events: [] })

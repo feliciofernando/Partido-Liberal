@@ -150,7 +150,7 @@ async function getUpcomingEvents() {
   try {
     const today = new Date().toISOString().split('T')[0];
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/Events?date=gte.${today}&select=*&order=date.asc&limit=3`,
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/Event?date=gte.${today}&select=*&order=date.asc&limit=3`,
       {
         headers: {
           apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
